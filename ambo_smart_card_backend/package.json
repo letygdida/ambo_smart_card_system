@@ -1,0 +1,31 @@
+{
+  "name": "ambo_smart_card_backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node backend/server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "express-fileupload": "^1.5.2",
+    "form-data": "^4.0.6",
+    "jsbarcode": "^3.12.3",
+    "jsonwebtoken": "^9.0.3",
+    "multer": "^2.2.0",
+    "mysql2": "^3.23.2",
+    "node-fetch": "^3.3.2",
+    "qrcode": "^1.5.3",
+    "sharp": "^0.35.3",
+    "uuid": "^9.0.0",
+    "xlsx": "^0.18.5"
+  }
+}

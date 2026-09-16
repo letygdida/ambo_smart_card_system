@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Students API</title>
+</head>
+<body>
+    <h1>Students API Test</h1>
+    <button onclick="testAPI()">Test API</button>
+    <div id="result"></div>
+
+    <script>
+        async function testAPI() {
+            const token = prompt('Enter your auth token from localStorage:');
+            const resultDiv = document.getElementById('result');
+            
+            resultDiv.innerHTML = '<p>Loading...</p>';
+            
+            try {
+                const response = await fetch('http://localhost:5000/api/students', {
+                    headers: {
+                        'Authorization': 'Bearer ' + token
+                    }
+                });
+                
+                resultDiv.innerHTML = '<p>Status: ' + response.status + '</p>';
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    resultDiv.innerHTML += '<p>Students count: ' + data.length + '</p>';
+                    resultDiv.innerHTML += '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+                } else {
+                    const error = await response.text();
+                    resultDiv.innerHTML += '<p>Error: ' + error + '</p>';
+                }
+            } catch (err) {
+                resultDiv.innerHTML = '<p style="color:red">Error: ' + err.message + '</p>';
+            }
+        }
+    </script>
+</body>
+</html>

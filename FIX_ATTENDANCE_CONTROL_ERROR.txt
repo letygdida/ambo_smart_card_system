@@ -1,0 +1,154 @@
+====================================================================
+HOW TO FIX: "Unexpected token '<', '<!DOCTYPE'... is not valid JSON"
+====================================================================
+
+This error means the backend is returning an HTML error page instead of 
+JSON. This happens when the attendance control routes are not loaded.
+
+====================================================================
+SOLUTION - Follow These Steps:
+====================================================================
+
+STEP 1: Run Diagnostic
+------------------------
+Double-click: DIAGNOSE_ATTENDANCE_CONTROL.bat
+
+This will check:
+- ✓ If required files exist
+- ✓ If MySQL is running
+- ✓ If backend is responding
+- ✓ If database tables exist
+
+Fix any ❌ errors it finds.
+
+
+STEP 2: Run Database Migration
+-------------------------------
+Open MySQL and run:
+
+mysql -u root -p ambo_smart_card < backend\sql\employee_attendance_control.sql
+
+OR in MySQL Workbench:
+- Open: backend\sql\employee_attendance_control.sql
+- Execute the entire script
+
+This creates 3 tables:
+- employee_attendance_control
+- employee_attendance_control_logs  
+- employee_attendance_records
+
+
+STEP 3: Restart Backend Server
+-------------------------------
+IMPORTANT: You MUST restart the backend!
+
+Option A - Use setup script:
+   Double-click: SETUP_ATTENDANCE_CONTROL.bat
+
+Option B - Manual:
+   1. Stop current backend (Ctrl+C)
+   2. cd backend
+   3. node server.js
+
+Look for these messages:
+   ✓ Employee attendance control routes registered
+   ✓ Attendance scheduler started
+
+
+STEP 4: Verify Backend
+-----------------------
+Backend console should show:
+
+   MySQL Connected Successfully
+   ✓ Employee attendance control routes registered at /api/employee-attendance-control
+   Server running on port 5000
+   
+   === Starting Attendance Automation ===
+   🚀 Starting Automatic Attendance Scheduler...
+   ✅ Attendance scheduler started (checking every 60 seconds)
+
+
+STEP 5: Test in Browser
+------------------------
+1. Refresh browser (Ctrl+F5)
+2. Go to Employee Attendance page
+3. Click "ATTENDANCE CONTROL" tab
+4. Error should be gone
+
+
+====================================================================
+STILL NOT WORKING?
+====================================================================
+
+Check Backend Console for Errors:
+----------------------------------
+Look for error messages when starting the server.
+Common errors:
+
+1. "Cannot find module './services/attendance-scheduler'"
+   → File missing or path wrong
+   
+2. "Cannot find module './routes/employee-attendance-control'"
+   → File missing or path wrong
+   
+3. "Table 'ambo_smart_card.employee_attendance_control' doesn't exist"
+   → Run database migration (Step 2)
+   
+4. "Error: connect ECONNREFUSED"
+   → MySQL not running
+
+
+Test Backend API Manually:
+---------------------------
+Open browser and go to:
+http://localhost:5000/api/employee-attendance-control/status/check-in
+
+Should see JSON response like:
+{
+  "success": true,
+  "control": { ... },
+  "server_time": "..."
+}
+
+If you see HTML or "Cannot GET", backend routes not loaded.
+
+
+====================================================================
+QUICK FIX CHECKLIST
+====================================================================
+
+□ MySQL service is running
+□ Database migration SQL file executed successfully
+□ Backend server restarted (NOT just refreshed browser)
+□ Backend console shows "attendance control routes registered"
+□ Backend console shows "scheduler started"
+□ No errors in backend console
+□ Browser refreshed with Ctrl+F5
+□ Logged in as admin/staff user
+
+
+====================================================================
+FILES THAT MUST EXIST
+====================================================================
+
+backend\routes\employee-attendance-control.js
+backend\services\attendance-scheduler.js
+backend\sql\employee_attendance_control.sql
+
+If any are missing, they were not created properly.
+
+
+====================================================================
+SUPPORT
+====================================================================
+
+Still getting error? Check:
+1. Run DIAGNOSE_ATTENDANCE_CONTROL.bat
+2. Look at backend console for actual error
+3. Verify database tables exist:
+   mysql> USE ambo_smart_card;
+   mysql> SHOW TABLES LIKE 'employee_attendance%';
+4. Test API endpoint in browser
+5. Check frontend browser console for network errors
+
+====================================================================
