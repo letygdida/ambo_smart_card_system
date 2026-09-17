@@ -77,18 +77,19 @@ router.get("/", verifyToken, (req, res) => {
 });
 
 // ===== POST - ADD NEW STUDENT =====
-router.post("/add", verifyToken, (req, res) => {
+router.post("/add", verifyToken, upload.fields([
+    { name: 'photo', maxCount: 1 }
+]), (req, res) => {
     console.log('POST /api/students/add - Adding new student');
     
-    const {
-        student_id,
-        name,
-        department,
-        year,
-        personal_email,
-        phone_number,
-        emergency_contact
-    } = req.body;
+    // Parse FormData fields
+    const student_id = req.body.student_id;
+    const name = req.body.name;
+    const department = req.body.department;
+    const year = req.body.year;
+    const personal_email = req.body.personal_email || '';
+    const phone_number = req.body.phone_number || '';
+    const emergency_contact = req.body.emergency_contact || '';
 
     let photoFilename = null;
 

@@ -81,7 +81,7 @@ function Employees() {
   });
   const [stats, setStats] = useState({});
   const fileInputRef = React.useRef(null);
-  const token = getToken().getItem('token');
+  const token = getToken();
 
   // Fetch employees on component mount
   useEffect(() => {
@@ -91,7 +91,7 @@ function Employees() {
   }, []);
 
   const fetchEmployees = () => {
-    const token = getToken().getItem('token');
+    const token = getToken();
     if (!token) {
       setError('Session expired. Please log in again.');
       return;
@@ -144,7 +144,7 @@ function Employees() {
   };
 
   const fetchStats = () => {
-    const token = getToken().getItem('token');
+    const token = getToken();
     if (!token) return;
     
     fetch(`${API_URL}/api/employees/dashboard/stats`, {
