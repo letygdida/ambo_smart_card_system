@@ -2,28 +2,28 @@ const db = require('./backend/db');
 
 console.log('🚀 Populating Departments Table...\n');
 
-// Ambo University departments
+// Ambo University departments (using code and name to match production schema)
 const departments = [
-  { department_code: 'CS', department_name: 'Computer Science', campus: 'Main Campus', status: 'active' },
-  { department_code: 'SE', department_name: 'Software Engineering', campus: 'Main Campus', status: 'active' },
-  { department_code: 'IS', department_name: 'Information Systems', campus: 'Main Campus', status: 'active' },
-  { department_code: 'EE', department_name: 'Electrical Engineering', campus: 'Main Campus', status: 'active' },
-  { department_code: 'ME', department_name: 'Mechanical Engineering', campus: 'Main Campus', status: 'active' },
-  { department_code: 'CE', department_name: 'Civil Engineering', campus: 'Main Campus', status: 'active' },
-  { department_code: 'BA', department_name: 'Business Administration', campus: 'Main Campus', status: 'active' },
-  { department_code: 'AC', department_name: 'Accounting', campus: 'Main Campus', status: 'active' },
-  { department_code: 'EC', department_name: 'Economics', campus: 'Main Campus', status: 'active' },
-  { department_code: 'MA', department_name: 'Mathematics', campus: 'Main Campus', status: 'active' },
-  { department_code: 'PH', department_name: 'Physics', campus: 'Main Campus', status: 'active' },
-  { department_code: 'CH', department_name: 'Chemistry', campus: 'Main Campus', status: 'active' },
-  { department_code: 'EN', department_name: 'English Language', campus: 'Main Campus', status: 'active' },
-  { department_code: 'HI', department_name: 'History', campus: 'Main Campus', status: 'active' },
-  { department_code: 'PS', department_name: 'Psychology', campus: 'Main Campus', status: 'active' },
-  { department_code: 'SO', department_name: 'Sociology', campus: 'Main Campus', status: 'active' },
-  { department_code: 'GE', department_name: 'Geography', campus: 'Main Campus', status: 'active' },
-  { department_code: 'AR', department_name: 'Architecture', campus: 'Main Campus', status: 'active' },
-  { department_code: 'AG', department_name: 'Agriculture', campus: 'Main Campus', status: 'active' },
-  { department_code: 'LV', department_name: 'Law', campus: 'Main Campus', status: 'active' }
+  { code: 'CS', name: 'Computer Science' },
+  { code: 'SE', name: 'Software Engineering' },
+  { code: 'IS', name: 'Information Systems' },
+  { code: 'EE', name: 'Electrical Engineering' },
+  { code: 'ME', name: 'Mechanical Engineering' },
+  { code: 'CE', name: 'Civil Engineering' },
+  { code: 'BA', name: 'Business Administration' },
+  { code: 'AC', name: 'Accounting' },
+  { code: 'EC', name: 'Economics' },
+  { code: 'MA', name: 'Mathematics' },
+  { code: 'PH', name: 'Physics' },
+  { code: 'CH', name: 'Chemistry' },
+  { code: 'EN', name: 'English Language' },
+  { code: 'HI', name: 'History' },
+  { code: 'PS', name: 'Psychology' },
+  { code: 'SO', name: 'Sociology' },
+  { code: 'GE', name: 'Geography' },
+  { code: 'AR', name: 'Architecture' },
+  { code: 'AG', name: 'Agriculture' },
+  { code: 'LV', name: 'Law' }
 ];
 
 console.log(`Found ${departments.length} departments to insert\n`);
@@ -38,33 +38,55 @@ function insertNext(index) {
     console.log(`✅ COMPLETE: ${inserted} departments inserted, ${skipped} skipped, ${errors} errors`);
     console.log(`========================================\n`);
     console.log('Next steps:');
-    console.log('1. Restart the backend server');
+    console.log('1. Restart the backend server to apply the departments route fix');
     console.log('2. Refresh the Students/Employees pages');
     console.log('3. Verify the Department dropdown now shows all departments');
+    console.log('4. Test with: SELECT * FROM departments;');
     process.exit(0);
   }
 
   const dept = departments[index];
-  
+
+  // Check if department with same code already exists
   db.query(
-    `INSERT INTO departments (department_code, department_name, campus, status) 
-     VALUES (?, ?, ?, ?)`,
-    [dept.department_code, dept.department_name, dept.campus, dept.status],
+    `SELECT id FROM departments WHERE code = ?`,
+    [dept.code],
     (err, result) => {
       if (err) {
-        if (err.code === 'ER_DUP_ENTRY') {
-          console.log(`⏭️  Skipped: ${dept.department_name} (already exists)`);
-          skipped++;
-        } else {
-          console.error(`✗ Error inserting ${dept.department_name}:`, err.message);
-          errors++;
-        }
-      } else {
-        console.log(`✓ Inserted: ${dept.department_name} (${dept.department_code})`);
-        inserted++;
+        console.error(`✗ Error checking ${dept.name}:`, err.message);
+        errors++;
+        insertNext(index + 1);
+        return;
       }
-      
-      insertNext(index + 1);
+
+      if (result.length > 0) {
+        console.log(`⏭️  Skipped: ${dept.name} (already exists with id=${result[0].id})`);
+        skipped++;
+        insertNext(index + 1);
+        return;
+      }
+
+      // Insert new department
+      db.query(
+        `INSERT INTO departments (code, name) VALUES (?, ?)`,
+        [dept.code, dept.name],
+        (err, result) => {
+          if (err) {
+            if (err.code === 'ER_DUP_ENTRY') {
+              console.log(`⏭️  Skipped: ${dept.name} (already exists)`);
+              skipped++;
+            } else {
+              console.error(`✗ Error inserting ${dept.name}:`, err.message);
+              errors++;
+            }
+          } else {
+            console.log(`✓ Inserted: ${dept.name} (${dept.code})`);
+            inserted++;
+          }
+
+          insertNext(index + 1);
+        }
+      );
     }
   );
 }

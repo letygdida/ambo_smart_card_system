@@ -1,0 +1,5 @@
+node_modules/
+.env
+.DS_Store
+ambo_smart_card_backend/node_modules/
+ambo_smart_card_backend/.env

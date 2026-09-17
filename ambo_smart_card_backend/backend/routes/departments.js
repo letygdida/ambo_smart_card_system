@@ -6,10 +6,9 @@ const { verifyToken, adminOnly } = require('../middleware/auth');
 // GET all departments (public)
 router.get('/', (req, res) => {
   db.query(`
-    SELECT id, department_code, department_name, campus, status
+    SELECT id, code as department_code, name as department_name
     FROM departments
-    WHERE status = 'active'
-    ORDER BY department_name ASC
+    ORDER BY name ASC
   `, (err, results) => {
     if (err) {
       return res.status(500).json({ error: 'Database error', details: err.message });
@@ -23,7 +22,7 @@ router.get('/:departmentId', (req, res) => {
   const { departmentId } = req.params;
 
   db.query(`
-    SELECT id, department_code, department_name, campus, status
+    SELECT id, code as department_code, name as department_name
     FROM departments
     WHERE id = ?
   `, [departmentId], (err, results) => {
@@ -40,19 +39,19 @@ router.get('/:departmentId', (req, res) => {
 // CREATE new department (Admin only)
 router.post('/', verifyToken, adminOnly, (req, res) => {
   try {
-    const { department_code, department_name, campus } = req.body;
+    const { department_code, department_name } = req.body;
 
     if (!department_code || !department_name) {
       return res.status(400).json({ error: 'Missing required fields: department_code, department_name' });
     }
 
     db.query(`
-      INSERT INTO departments (department_code, department_name, campus, status)
-      VALUES (?, ?, ?, 'active')
-    `, [department_code, department_name, campus || null], (err, result) => {
+      INSERT INTO departments (code, name)
+      VALUES (?, ?)
+    `, [department_code, department_name], (err, result) => {
       if (err) {
         if (err.code === 'ER_DUP_ENTRY') {
-          return res.status(400).json({ error: 'Department code or name already exists' });
+          return res.status(400).json({ error: 'Department code already exists' });
         }
         return res.status(500).json({ error: 'Database error', details: err.message });
       }
@@ -71,27 +70,18 @@ router.post('/', verifyToken, adminOnly, (req, res) => {
 router.put('/:departmentId', verifyToken, adminOnly, (req, res) => {
   try {
     const { departmentId } = req.params;
-    const { department_code, department_name, campus, status } = req.body;
+    const { department_code, department_name } = req.body;
 
-    // Build update query
     const updates = [];
     const values = [];
 
     if (department_code) {
-      updates.push('department_code = ?');
+      updates.push('code = ?');
       values.push(department_code);
     }
     if (department_name) {
-      updates.push('department_name = ?');
+      updates.push('name = ?');
       values.push(department_name);
-    }
-    if (campus) {
-      updates.push('campus = ?');
-      values.push(campus);
-    }
-    if (status) {
-      updates.push('status = ?');
-      values.push(status);
     }
 
     if (updates.length === 0) {
@@ -107,7 +97,7 @@ router.put('/:departmentId', verifyToken, adminOnly, (req, res) => {
     `, values, (err) => {
       if (err) {
         if (err.code === 'ER_DUP_ENTRY') {
-          return res.status(400).json({ error: 'Department code or name already exists' });
+          return res.status(400).json({ error: 'Department code already exists' });
         }
         return res.status(500).json({ error: 'Database error', details: err.message });
       }
