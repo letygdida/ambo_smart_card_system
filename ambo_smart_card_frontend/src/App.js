@@ -25,10 +25,11 @@ import EmployeeAttendanceModule from "./components/EmployeeAttendanceModule";
 import EmployeeAttendanceControl from "./components/EmployeeAttendanceControl";
 import CafeteriaAttendanceDashboard from "./components/CafeteriaAttendanceDashboard";
 import AdminSettings from "./components/AdminSettings";
+import { getToken, getUserRole } from "./auth";
 
 // ===== PROTECTED ROUTE - Requires authentication =====
 function ProtectedRoute({ children }) {
-  const token = localStorage.getItem("token");
+  const token = getToken();
 
   if (!token) {
     return <Navigate to="/login" replace />;
@@ -39,8 +40,8 @@ function ProtectedRoute({ children }) {
 
 // ===== ROLE-BASED ROUTE - Requires specific role =====
 function RoleBasedRoute({ children, allowedRoles }) {
-  const token = localStorage.getItem("token");
-  const role = localStorage.getItem("role");
+  const token = getToken();
+  const role = getUserRole();
 
   if (!token) {
     return <Navigate to="/login" replace />;

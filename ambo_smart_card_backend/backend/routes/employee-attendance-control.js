@@ -1,6 +1,8 @@
 const express = require("express");
+const jwt = require("jsonwebtoken");
 const router = express.Router();
 const db = require("../db");
+const config = require("../config");
 const attendanceScheduler = require("../services/attendance-scheduler");
 
 // =====================================================
@@ -18,9 +20,8 @@ const isAdmin = (req, res, next) => {
         return res.status(401).json({ error: "Invalid token format" });
     }
 
-    const jwt = require("jsonwebtoken");
     try {
-        const decoded = jwt.verify(token, "smartcard_secret");
+        const decoded = jwt.verify(token, config.JWT_SECRET);
         req.user = decoded;
 
         // Check if user is admin or staff

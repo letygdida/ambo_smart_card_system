@@ -1,4 +1,5 @@
-﻿import { API_URL } from '../config';
+import { API_URL } from '../config';
+import { getToken, clearSession } from '../auth';
 
 import React, { useState, useEffect } from 'react';
 import {
@@ -80,7 +81,7 @@ function Employees() {
   });
   const [stats, setStats] = useState({});
   const fileInputRef = React.useRef(null);
-  const token = localStorage.getItem('token');
+  const token = getToken().getItem('token');
 
   // Fetch employees on component mount
   useEffect(() => {
@@ -90,7 +91,7 @@ function Employees() {
   }, []);
 
   const fetchEmployees = () => {
-    const token = localStorage.getItem('token');
+    const token = getToken().getItem('token');
     if (!token) {
       setError('Session expired. Please log in again.');
       return;
@@ -108,7 +109,7 @@ function Employees() {
       .catch(err => {
         if (err.message.includes('Invalid token') || err.message.includes('jwt expired')) {
           setError('Session expired. Please log in again.');
-          localStorage.removeItem('token');
+          clearSession();
           localStorage.removeItem('role');
           localStorage.removeItem('username');
           window.location.href = '/login';
@@ -143,7 +144,7 @@ function Employees() {
   };
 
   const fetchStats = () => {
-    const token = localStorage.getItem('token');
+    const token = getToken().getItem('token');
     if (!token) return;
     
     fetch(`${API_URL}/api/employees/dashboard/stats`, {
@@ -154,7 +155,7 @@ function Employees() {
       .catch(err => {
         if (err.message.includes('Invalid token') || err.message.includes('jwt expired')) {
           setError('Session expired. Please log in again.');
-          localStorage.removeItem('token');
+          clearSession();
           localStorage.removeItem('role');
           localStorage.removeItem('username');
           window.location.href = '/login';
@@ -385,10 +386,10 @@ function Employees() {
         // Refetch stats from backend to ensure accuracy
         fetchStats();
 
-        alert('✅ Employee deactivated successfully');
+        alert('? Employee deactivated successfully');
       } catch (err) {
         setError(err.message);
-        alert('❌ Error: ' + err.message);
+        alert('? Error: ' + err.message);
       }
     }
   };
@@ -416,15 +417,15 @@ function Employees() {
       // Refetch stats from backend to ensure accuracy
       fetchStats();
 
-      alert('✅ Employee reactivated successfully');
+      alert('? Employee reactivated successfully');
     } catch (err) {
       setError(err.message);
-      alert('❌ Error: ' + err.message);
+      alert('? Error: ' + err.message);
     }
   };
 
   const handleDelete = async (employeeId) => {
-    if (window.confirm(`⚠️ Are you sure you want to DELETE this employee? This action cannot be undone.`)) {
+    if (window.confirm(`?? Are you sure you want to DELETE this employee? This action cannot be undone.`)) {
       try {
         setLoading(true);
         const res = await fetch(`${API_URL}/api/employees/${employeeId}`, {
@@ -444,10 +445,10 @@ function Employees() {
         // Refetch stats
         fetchStats();
 
-        alert('✅ Employee deleted successfully');
+        alert('? Employee deleted successfully');
       } catch (err) {
         setError(err.message);
-        alert('❌ Error: ' + err.message);
+        alert('? Error: ' + err.message);
       } finally {
         setLoading(false);
       }
@@ -492,10 +493,10 @@ function Employees() {
         fetchStats();
       }, 500);
 
-      alert(`✅ Import complete: ${data.success} succeeded, ${data.failed} failed`);
+      alert(`? Import complete: ${data.success} succeeded, ${data.failed} failed`);
     } catch (err) {
       setError(err.message);
-      alert('❌ Error: ' + err.message);
+      alert('? Error: ' + err.message);
     } finally {
       setImportLoading(false);
     }
@@ -907,7 +908,7 @@ function Employees() {
           {importResults ? (
             <Box>
               <Alert severity={importResults.failed === 0 ? 'success' : 'warning'} sx={{ mb: 2 }}>
-                ✅ {importResults.success} imported successfully {importResults.failed > 0 ? `| ❌ ${importResults.failed} failed` : ''}
+                ? {importResults.success} imported successfully {importResults.failed > 0 ? `| ? ${importResults.failed} failed` : ''}
               </Alert>
               
               {importResults.employees.length > 0 && (
@@ -971,12 +972,12 @@ function Employees() {
 
               <Typography variant="body2" sx={{ mb: 2, p: 1, bgcolor: '#e3f2fd', borderRadius: '4px' }}>
                 <strong>Required Columns:</strong><br/>
-                • First Name<br/>
-                • Last Name<br/>
-                • Email<br/>
-                • Position<br/>
+                � First Name<br/>
+                � Last Name<br/>
+                � Email<br/>
+                � Position<br/>
                 <strong>Optional Columns:</strong><br/>
-                • Department • Phone • Gender • Employee Type
+                � Department � Phone � Gender � Employee Type
               </Typography>
             </Box>
           )}

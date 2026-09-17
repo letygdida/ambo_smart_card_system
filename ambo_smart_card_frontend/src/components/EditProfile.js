@@ -1,4 +1,5 @@
-﻿import { API_URL } from '../config';
+import { API_URL } from '../config';
+import { getToken } from '../auth';
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -48,7 +49,7 @@ const EditProfile = () => {
 
     const loadProfile = async () => {
         try {
-            const token = localStorage.getItem('token');
+            const token = getToken();
             
             if (!token) {
                 setError('Please login first');
@@ -182,7 +183,7 @@ const EditProfile = () => {
         setError('');
 
         try {
-            const token = localStorage.getItem('token');
+            const token = getToken();
             
             if (!token) {
                 throw new Error('Please login again');
@@ -731,3 +732,5 @@ const EditProfile = () => {
 };
 
 export default EditProfile;
+
+

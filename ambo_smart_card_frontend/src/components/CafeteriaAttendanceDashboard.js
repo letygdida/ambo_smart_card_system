@@ -1,4 +1,5 @@
-﻿import { API_URL } from '../config';
+import { API_URL } from '../config';
+import { safeFetch, getToken, clearSession, getUserRole } from '../auth';
 
 import React, { useEffect, useState, useRef } from 'react';
 import { Scanner } from '@yudiel/react-qr-scanner';
@@ -44,32 +45,7 @@ import { useNavigate } from 'react-router-dom';
 // HELPER FUNCTIONS
 // ============================================================================
 
-// Safe JSON fetch with proper error handling
-const safeFetch = async (url, options = {}) => {
-  try {
-    const response = await fetch(url, options);
-    const contentType = response.headers.get('content-type');
-    
-    if (!contentType || !contentType.includes('application/json')) {
-      const text = await response.text();
-      const preview = text.substring(0, 200);
-      throw new Error(
-        `Server returned ${contentType || 'unknown type'} instead of JSON. ` +
-        `Status: ${response.status}. Response: "${preview}..."`
-      );
-    }
-    
-    const data = await response.json();
-    
-    if (!response.ok) {
-      throw new Error(data.error || data.message || `HTTP ${response.status}`);
-    }
-    
-    return { success: true, data };
-  } catch (error) {
-    return { success: false, error: error.message };
-  }
-};
+// Safe JSON fetch is now imported from auth.js for centralized 401 handling
 
 // Get remaining time until meal closes
 const getRemainingTime = (endTime) => {
@@ -140,8 +116,8 @@ function CafeteriaAttendanceDashboard() {
   // Meal selection (for manual scanning)
   const [selectedMealType, setSelectedMealType] = useState('breakfast');
 
-  const token = localStorage.getItem('token');
-  const userRole = localStorage.getItem('role');
+  const token = getToken();
+  const userRole = getUserRole();
 
   // Check authorization
   useEffect(() => {
@@ -227,7 +203,7 @@ function CafeteriaAttendanceDashboard() {
     const studentId = manualInput.trim() || scanStudentId.trim();
     
     if (!studentId) {
-      setMessage('⚠️ Please enter or scan a student ID');
+      setMessage('?? Please enter or scan a student ID');
       return;
     }
 
@@ -235,7 +211,7 @@ function CafeteriaAttendanceDashboard() {
     if (mealStatus?.mealStatus) {
       const anyOpen = Object.values(mealStatus.mealStatus).some(m => m.is_open);
       if (!anyOpen) {
-        setMessage('🔒 Cafeteria is CLOSED - Cannot process scan');
+        setMessage('?? Cafeteria is CLOSED - Cannot process scan');
         return;
       }
     }
@@ -268,7 +244,7 @@ function CafeteriaAttendanceDashboard() {
       }
 
       if (response.ok) {
-        setMessage(`✅ ${data.message || 'Attendance recorded successfully!'}`);
+        setMessage(`? ${data.message || 'Attendance recorded successfully!'}`);
         setManualInput('');
         setScanStudentId('');
         setShowCameraScanner(false);
@@ -280,17 +256,17 @@ function CafeteriaAttendanceDashboard() {
       } else {
         // Handle different error types
         if (response.status === 403) {
-          setMessage(`🔒 ${data.message || 'Cafeteria is closed'}`);
+          setMessage(`?? ${data.message || 'Cafeteria is closed'}`);
         } else if (response.status === 400) {
-          setMessage(`⚠️ ${data.message || 'Invalid request'}`);
+          setMessage(`?? ${data.message || 'Invalid request'}`);
         } else if (response.status === 404) {
-          setMessage(`❌ Student not found: ${studentId}`);
+          setMessage(`? Student not found: ${studentId}`);
         } else {
-          setMessage(`❌ ${data.error || 'Scan failed'}`);
+          setMessage(`? ${data.error || 'Scan failed'}`);
         }
       }
     } catch (err) {
-      setMessage(`❌ Error: ${err.message}`);
+      setMessage(`? Error: ${err.message}`);
     } finally {
       setScanning(false);
     }
@@ -304,7 +280,7 @@ function CafeteriaAttendanceDashboard() {
 
   // Meal control function
   const handleMealControl = async (mealType, action) => {
-    const token = localStorage.getItem('token');
+    const token = getToken();
     if (!token) {
       setMessage('Session expired. Please log in again.');
       localStorage.removeItem('token');
@@ -329,17 +305,17 @@ function CafeteriaAttendanceDashboard() {
       const data = await response.json();
 
       if (!response.ok) {
-        setMessage(`❌ ${data.error || 'Failed to update meal status'}`);
+        setMessage(`? ${data.error || 'Failed to update meal status'}`);
         return;
       }
 
-      setMessage(`✅ ${data.message}`);
+      setMessage(`? ${data.message}`);
       // Refresh meal status
       setTimeout(() => {
         fetchMealStatus();
       }, 1000);
     } catch (err) {
-      setMessage(`❌ Error: ${err.message}`);
+      setMessage(`? Error: ${err.message}`);
       console.error('Meal control error:', err);
     }
   };
@@ -375,18 +351,18 @@ function CafeteriaAttendanceDashboard() {
                 <Typography variant="body2" fontWeight="bold" color="primary">
                   {meal.is_open ? (
                     <span style={{ color: '#4caf50' }}>
-                      ✅ OPEN - {meal.control_mode === 'manually_opened' ? 'Manually Opened' : 'Auto'}
+                      ? OPEN - {meal.control_mode === 'manually_opened' ? 'Manually Opened' : 'Auto'}
                     </span>
                   ) : (
                     <span style={{ color: '#f44336' }}>
-                      🔒 CLOSED - {meal.control_mode === 'manually_closed' ? 'Manually Closed' : 'Auto'}
+                      ?? CLOSED - {meal.control_mode === 'manually_closed' ? 'Manually Closed' : 'Auto'}
                     </span>
                   )}
                 </Typography>
               </Box>
               
               <Typography variant="body2" sx={{ mb: 0.5 }}>
-                ⏰ {meal.start_time} - {meal.end_time}
+                ? {meal.start_time} - {meal.end_time}
               </Typography>
               
               <Typography variant="body2" color="textSecondary">
@@ -403,7 +379,7 @@ function CafeteriaAttendanceDashboard() {
               
               {isCurrent && meal.is_open && (
                 <Typography variant="body2" color="#4caf50" fontWeight="bold">
-                  🎯 CURRENT MEAL
+                  ?? CURRENT MEAL
                 </Typography>
               )}
             </Grid>
@@ -437,7 +413,7 @@ function CafeteriaAttendanceDashboard() {
                 Daily Limit
               </Typography>
               <Typography variant="h6" fontWeight="bold" color="textPrimary">
-                {meal.daily_limit || '∞'}
+                {meal.daily_limit || '8'}
               </Typography>
               <Typography variant="caption" color="textSecondary">
                 per student
@@ -454,14 +430,14 @@ function CafeteriaAttendanceDashboard() {
     <Card sx={{ mb: 3, boxShadow: 3 }}>
       <CardContent>
         <Typography variant="h6" fontWeight="bold" gutterBottom>
-          📷 Smart Card Scanner
+          ?? Smart Card Scanner
         </Typography>
 
         {/* Meal Selection for Manual Entry */}
         {!showCameraScanner && (
           <Box sx={{ mb: 2, p: 2, bgcolor: '#e3f2fd', borderRadius: 1 }}>
             <Typography variant="subtitle2" fontWeight="bold" sx={{ mb: 1 }}>
-              🍽️ Select Meal Type
+              ??? Select Meal Type
             </Typography>
             <Grid container spacing={1}>
               {['breakfast', 'lunch', 'dinner'].map((meal) => (
@@ -494,15 +470,15 @@ function CafeteriaAttendanceDashboard() {
                     const data = JSON.parse(results[0].rawValue);
                     if (data.studentId) {
                       setScanStudentId(data.studentId);
-                      setMessage(`✅ QR Code detected: ${data.studentId}`);
+                      setMessage(`? QR Code detected: ${data.studentId}`);
                     } else {
                       setScanStudentId(results[0].rawValue);
-                      setMessage(`✅ Code detected: ${results[0].rawValue}`);
+                      setMessage(`? Code detected: ${results[0].rawValue}`);
                     }
                     setTimeout(() => handleScan(), 500);
                   } catch (e) {
                     setScanStudentId(results[0].rawValue);
-                    setMessage(`✅ Barcode detected: ${results[0].rawValue}`);
+                    setMessage(`? Barcode detected: ${results[0].rawValue}`);
                     setTimeout(() => handleScan(), 500);
                   }
                   setShowCameraScanner(false);
@@ -535,7 +511,7 @@ function CafeteriaAttendanceDashboard() {
         {!showCameraScanner && (
           <Box sx={{ mt: 2, p: 2, bgcolor: '#f5f5f5', borderRadius: 1 }}>
             <Typography variant="subtitle2" fontWeight="bold" sx={{ mb: 1 }}>
-              ⌨️ Manual Student ID Entry
+              ?? Manual Student ID Entry
             </Typography>
             <Grid container spacing={1}>
               <Grid item xs={8}>
@@ -574,7 +550,7 @@ function CafeteriaAttendanceDashboard() {
             onClick={() => setShowCameraScanner(!showCameraScanner)}
             disabled={scanning}
           >
-            {showCameraScanner ? 'Stop Camera' : '📷 Use Camera'}
+            {showCameraScanner ? 'Stop Camera' : '?? Use Camera'}
           </Button>
           
           <Button
@@ -585,7 +561,7 @@ function CafeteriaAttendanceDashboard() {
               if (manualInput) {
                 handleScan();
               } else {
-                setMessage('⚠️ Enter a student ID first or use camera');
+                setMessage('?? Enter a student ID first or use camera');
               }
             }}
             disabled={scanning}
@@ -649,7 +625,7 @@ function CafeteriaAttendanceDashboard() {
     <Card sx={{ mt: 3 }}>
       <CardContent>
         <Typography variant="h6" fontWeight="bold" sx={{ mb: 2 }}>
-          📋 Recent Attendance Records
+          ?? Recent Attendance Records
         </Typography>
         
         {loading && records.length === 0 ? (
@@ -717,7 +693,7 @@ function CafeteriaAttendanceDashboard() {
       {/* Header */}
       <Box sx={{ mb: 3 }}>
         <Typography variant="h4" fontWeight="bold" gutterBottom>
-          🍽️ Cafeteria Attendance
+          ??? Cafeteria Attendance
         </Typography>
         <Typography variant="body2" color="textSecondary">
           {mealStatus?.currentTime ? `Current Time: ${mealStatus.currentTime}` : ''}
@@ -734,7 +710,7 @@ function CafeteriaAttendanceDashboard() {
       {/* Success Message */}
       {message && (
         <Alert 
-          severity={message.includes('✅') ? 'success' : message.includes('⚠️') ? 'warning' : 'error'} 
+          severity={message.includes('?') ? 'success' : message.includes('??') ? 'warning' : 'error'} 
           sx={{ mb: 2 }}
         >
           {message}
@@ -747,7 +723,7 @@ function CafeteriaAttendanceDashboard() {
       {/* Meal Status Section */}
       <Box sx={{ mb: 3 }}>
         <Typography variant="h5" fontWeight="bold" sx={{ mb: 2 }}>
-          🍳 Meal Status & Times
+          ?? Meal Status & Times
         </Typography>
         <Grid container spacing={2}>
           {Object.entries(mealStatus?.mealStatus || {}).map(([mealType, meal]) => (
@@ -767,7 +743,7 @@ function CafeteriaAttendanceDashboard() {
       {/* Footer Info */}
       <Box sx={{ mt: 4, p: 2, bgcolor: '#f5f5f5', borderRadius: 1, textAlign: 'center' }}>
         <Typography variant="caption" color="textSecondary">
-          ⚠️ Attendance can only be recorded when cafeteria is open. <br/>
+          ?? Attendance can only be recorded when cafeteria is open. <br/>
           Contact IT support if you encounter scanning issues.
         </Typography>
       </Box>

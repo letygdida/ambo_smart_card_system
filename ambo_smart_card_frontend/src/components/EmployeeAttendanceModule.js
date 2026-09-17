@@ -1,4 +1,5 @@
-﻿import { API_URL } from '../config';
+import { API_URL } from '../config';
+import { getToken } from '../auth';
 
 import React, { useState, useEffect } from 'react';
 import { Scanner } from '@yudiel/react-qr-scanner';
@@ -93,7 +94,7 @@ function EmployeeAttendanceModule() {
   const [openClearDialog, setOpenClearDialog] = useState(false);
   const [clearLoading, setClearLoading] = useState(false);
 
-  const token = localStorage.getItem('token');
+  const token = getToken();
 
   // Load attendance control status on mount
   useEffect(() => {
@@ -124,7 +125,7 @@ function EmployeeAttendanceModule() {
       if (!contentType || !contentType.includes('application/json')) {
         console.error('Backend returned non-JSON response. Server may not be running correctly.');
         setControlLoading(false);
-        setError('⚠️ Attendance control system is not available. Please restart the backend server.');
+        setError('?? Attendance control system is not available. Please restart the backend server.');
         return;
       }
 
@@ -136,7 +137,7 @@ function EmployeeAttendanceModule() {
         setError(''); // Clear any previous errors
       } else {
         setControlLoading(false);
-        setError('⚠️ Failed to load attendance control status');
+        setError('?? Failed to load attendance control status');
       }
     } catch (err) {
       console.error('Error loading control status:', err);
@@ -148,7 +149,7 @@ function EmployeeAttendanceModule() {
 
   // Manual control: Open attendance
   const handleManualOpen = async () => {
-    const token = localStorage.getItem('token');
+    const token = getToken();
     if (!token) {
       setError('Session expired. Please log in again.');
       localStorage.removeItem('token');
@@ -174,7 +175,7 @@ function EmployeeAttendanceModule() {
       // Check if response is JSON
       const contentType = response.headers.get('content-type');
       if (!contentType || !contentType.includes('application/json')) {
-        setError('❌ Backend error: Server not responding correctly. Please restart backend and run database migration.');
+        setError('? Backend error: Server not responding correctly. Please restart backend and run database migration.');
         setLoading(false);
         return;
       }
@@ -187,7 +188,7 @@ function EmployeeAttendanceModule() {
         return;
       }
 
-      setSuccess(`✅ ${attendanceType} attendance opened successfully`);
+      setSuccess(`? ${attendanceType} attendance opened successfully`);
       loadControlStatus();
       setLoading(false);
 
@@ -200,7 +201,7 @@ function EmployeeAttendanceModule() {
         localStorage.removeItem('username');
         window.location.href = '/login';
       } else {
-        setError(`❌ Error: ${err.message}. Ensure backend is running.`);
+        setError(`? Error: ${err.message}. Ensure backend is running.`);
       }
       setLoading(false);
     }
@@ -208,7 +209,7 @@ function EmployeeAttendanceModule() {
 
   // Manual control: Close attendance
   const handleManualClose = async () => {
-    const token = localStorage.getItem('token');
+    const token = getToken();
     if (!token) {
       setError('Session expired. Please log in again.');
       localStorage.removeItem('token');
@@ -234,7 +235,7 @@ function EmployeeAttendanceModule() {
       // Check if response is JSON
       const contentType = response.headers.get('content-type');
       if (!contentType || !contentType.includes('application/json')) {
-        setError('❌ Backend error: Server not responding correctly. Please restart backend and run database migration.');
+        setError('? Backend error: Server not responding correctly. Please restart backend and run database migration.');
         setLoading(false);
         return;
       }
@@ -247,7 +248,7 @@ function EmployeeAttendanceModule() {
         return;
       }
 
-      setSuccess(`✅ ${attendanceType} attendance closed successfully`);
+      setSuccess(`? ${attendanceType} attendance closed successfully`);
       loadControlStatus();
       setLoading(false);
 
@@ -260,7 +261,7 @@ function EmployeeAttendanceModule() {
         localStorage.removeItem('username');
         window.location.href = '/login';
       } else {
-        setError(`❌ Error: ${err.message}. Ensure backend is running.`);
+        setError(`? Error: ${err.message}. Ensure backend is running.`);
       }
       setLoading(false);
     }
@@ -291,7 +292,7 @@ function EmployeeAttendanceModule() {
       // Check if response is JSON
       const contentType = response.headers.get('content-type');
       if (!contentType || !contentType.includes('application/json')) {
-        setError('❌ Backend error: Server returned invalid response. Please restart the backend server and ensure the database is set up.');
+        setError('? Backend error: Server returned invalid response. Please restart the backend server and ensure the database is set up.');
         setLoading(false);
         return;
       }
@@ -304,7 +305,7 @@ function EmployeeAttendanceModule() {
         return;
       }
 
-      setSuccess('✅ Configuration updated successfully');
+      setSuccess('? Configuration updated successfully');
       setShowConfigDialog(false);
       loadControlStatus();
       setLoading(false);
@@ -312,7 +313,7 @@ function EmployeeAttendanceModule() {
       setTimeout(() => setSuccess(''), 5000);
     } catch (err) {
       console.error('Configuration save error:', err);
-      setError(`❌ Error: ${err.message}. Backend may not be running or database not set up.`);
+      setError(`? Error: ${err.message}. Backend may not be running or database not set up.`);
       setLoading(false);
     }
   };
@@ -386,11 +387,11 @@ function EmployeeAttendanceModule() {
   const handleCameraError = (error) => {
     console.error('Camera scanner error:', error);
     setCameraError(`Camera error: ${error?.message || 'Unable to access camera'}`);
-    setError(`❌ Camera Error: ${error?.message || 'Unable to access camera'}`);
+    setError(`? Camera Error: ${error?.message || 'Unable to access camera'}`);
   };
 
   const handleAutoMarkAttendance = async (employeeId) => {
-    const token = localStorage.getItem('token');
+    const token = getToken();
     if (!token) {
       setError('Session expired. Please log in again.');
       localStorage.removeItem('token');
@@ -420,13 +421,13 @@ function EmployeeAttendanceModule() {
       const data = await res.json();
 
       if (!res.ok) {
-        setError(`❌ ${data.message || 'Failed to mark attendance'}`);
+        setError(`? ${data.message || 'Failed to mark attendance'}`);
         setMarkedEmployee(null);
         setScanning(false);
         return;
       }
 
-      setSuccess(`✅ ${data.message}`);
+      setSuccess(`? ${data.message}`);
       setMarkedEmployee(data.employee);
       setScanning(false);
 
@@ -448,7 +449,7 @@ function EmployeeAttendanceModule() {
         localStorage.removeItem('username');
         window.location.href = '/login';
       } else {
-        setError(`❌ Scan Error: ${err.message}`);
+        setError(`? Scan Error: ${err.message}`);
       }
       console.error('Auto mark employee attendance error:', err);
       setMarkedEmployee(null);
@@ -457,7 +458,7 @@ function EmployeeAttendanceModule() {
   };
 
   const markAttendance = async () => {
-    const token = localStorage.getItem('token');
+    const token = getToken();
     if (!token) {
       setError('Session expired. Please log in again.');
       localStorage.removeItem('token');
@@ -725,15 +726,15 @@ function EmployeeAttendanceModule() {
         const filename = `${filenameParts.join('_')}.csv`;
         
         downloadCSV(csvContent, filename);
-        setSuccess(`✅ CSV exported successfully: ${totalRecords} records exported`);
+        setSuccess(`? CSV exported successfully: ${totalRecords} records exported`);
         
         // Clear success message after 5 seconds
         setTimeout(() => setSuccess(''), 5000);
       } else {
-        setError('❌ No records found to export with current filters');
+        setError('? No records found to export with current filters');
       }
     } catch (err) {
-      setError(`❌ Export Error: ${err.message}`);
+      setError(`? Export Error: ${err.message}`);
       console.error('CSV Export error:', err);
     } finally {
       setLoading(false);
@@ -747,16 +748,16 @@ function EmployeeAttendanceModule() {
       setSuccess('');
 
       // Step 1: Export CSV first
-      setSuccess('📥 Exporting attendance records...');
+      setSuccess('?? Exporting attendance records...');
       await handleExportCSV();
 
       // Wait a moment for export to complete
       await new Promise(resolve => setTimeout(resolve, 500));
 
       // Step 2: Clear attendance
-      setSuccess('🗑️ Clearing today\'s attendance records...');
+      setSuccess('??? Clearing today\'s attendance records...');
 
-      const token = localStorage.getItem('token');
+      const token = getToken();
       if (!token) {
         setError('Session expired. Please log in again.');
         localStorage.removeItem('token');
@@ -778,12 +779,12 @@ function EmployeeAttendanceModule() {
       const data = await response.json();
 
       if (!response.ok) {
-        setError(`❌ ${data.error || 'Failed to clear attendance'}`);
+        setError(`? ${data.error || 'Failed to clear attendance'}`);
         setClearLoading(false);
         return;
       }
 
-      setSuccess(`✅ ${data.message} - ${data.recordsDeleted} records exported and cleared`);
+      setSuccess(`? ${data.message} - ${data.recordsDeleted} records exported and cleared`);
       console.log('Export & Clear completed:', data);
       
       setOpenClearDialog(false);
@@ -801,7 +802,7 @@ function EmployeeAttendanceModule() {
         localStorage.removeItem('username');
         window.location.href = '/login';
       } else {
-        setError(`❌ Error: ${err.message}`);
+        setError(`? Error: ${err.message}`);
       }
       console.error('Export & Clear error:', err);
       setClearLoading(false);
@@ -963,7 +964,7 @@ function EmployeeAttendanceModule() {
       {success && (
         <Alert severity="success" sx={{ mb: 2 }}>
           <Typography variant="body2">
-            <strong>✓ {success}</strong>
+            <strong>? {success}</strong>
           </Typography>
           {markedEmployee && (
             <Box sx={{ mt: 1 }}>
@@ -1004,7 +1005,7 @@ function EmployeeAttendanceModule() {
                   gap: 1,
                   color: controlStatus.current_status === 'open' ? '#2e7d32' : '#c62828'
                 }}>
-                  {controlStatus.current_status === 'open' ? '🟢 OPEN' : '🔴 CLOSED'}
+                  {controlStatus.current_status === 'open' ? '?? OPEN' : '?? CLOSED'}
                   <Chip 
                     label={`${attendanceType.toUpperCase()}`}
                     size="small"
@@ -1015,7 +1016,7 @@ function EmployeeAttendanceModule() {
                   {controlStatus.status_message}
                 </Typography>
                 <Typography variant="caption" sx={{ display: 'block', mt: 0.5, color: 'text.secondary' }}>
-                  Mode: {controlStatus.control_mode === 'manual' ? '👤 Manual' : '⏰ Automatic'}
+                  Mode: {controlStatus.control_mode === 'manual' ? '?? Manual' : '? Automatic'}
                   {controlStatus.control_mode === 'automatic' && controlStatus.auto_start_time && (
                     <span> | Window: {controlStatus.auto_start_time} - {controlStatus.auto_end_time}</span>
                   )}
@@ -1043,14 +1044,14 @@ function EmployeeAttendanceModule() {
                   onClick={loadControlStatus}
                   disabled={controlLoading}
                 >
-                  🔄 Refresh
+                  ?? Refresh
                 </Button>
               </Box>
             </Box>
 
             {controlStatus.current_status === 'closed' && (
               <Alert severity="warning" sx={{ mt: 2 }}>
-                <strong>⚠️ Attendance is currently CLOSED.</strong> Employees cannot mark {attendanceType} at this time.
+                <strong>?? Attendance is currently CLOSED.</strong> Employees cannot mark {attendanceType} at this time.
                 Contact your administrator to open attendance.
               </Alert>
             )}
@@ -1072,7 +1073,7 @@ function EmployeeAttendanceModule() {
           <Card sx={{ mb: 3 }}>
             <CardContent>
               <Typography variant="h6" sx={{ mb: 2 }}>
-                📋 Mark Employee Attendance by ID
+                ?? Mark Employee Attendance by ID
               </Typography>
               <Typography variant="body2" color="textSecondary" sx={{ mb: 2 }}>
                 Scan or enter the employee's ID (AU-EMP-YYYY-####). The system will automatically identify their staff type.
@@ -1092,7 +1093,7 @@ function EmployeeAttendanceModule() {
                       color="primary"
                     />
                   }
-                  label="📷 Enable PC Camera QR/Barcode Scanner"
+                  label="?? Enable PC Camera QR/Barcode Scanner"
                 />
                 {showCameraScanner && (
                   <Typography variant="caption" sx={{ display: 'block', color: 'textSecondary', mt: 0.5 }}>
@@ -1106,7 +1107,7 @@ function EmployeeAttendanceModule() {
                 <Card sx={{ mb: 3, bgcolor: '#f0f8ff', border: '2px dashed #1976d2' }}>
                   <CardContent>
                     <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 'bold' }}>
-                      📷 PC Camera Scanner
+                      ?? PC Camera Scanner
                     </Typography>
                     
                     {cameraError && (
@@ -1171,7 +1172,7 @@ function EmployeeAttendanceModule() {
                     {/* Instructions */}
                     <Box sx={{ mt: 2, p: 2, bgcolor: '#fff3e0', borderRadius: 1 }}>
                       <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 1 }}>
-                        📋 How to use Camera Scanner:
+                        ?? How to use Camera Scanner:
                       </Typography>
                       <Typography variant="body2" component="ul" sx={{ pl: 2, mb: 0 }}>
                         <li>Hold employee QR code or barcode steady in camera view</li>
@@ -1217,7 +1218,7 @@ function EmployeeAttendanceModule() {
           <Card sx={{ mb: 3, background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', color: 'white' }}>
             <CardContent>
               <Typography variant="h5" sx={{ mb: 2, fontWeight: 'bold' }}>
-                🎛️ Attendance Time Control
+                ??? Attendance Time Control
               </Typography>
               <Typography variant="body2" sx={{ mb: 3, opacity: 0.9 }}>
                 Control when employees can mark attendance. Choose Manual mode for direct control or Automatic mode for scheduled operation.
@@ -1231,7 +1232,7 @@ function EmployeeAttendanceModule() {
                         Current Status
                       </Typography>
                       <Chip
-                        label={controlStatus.current_status === 'open' ? '🟢 OPEN' : '🔴 CLOSED'}
+                        label={controlStatus.current_status === 'open' ? '?? OPEN' : '?? CLOSED'}
                         sx={{
                           bgcolor: controlStatus.current_status === 'open' ? '#4caf50' : '#f44336',
                           color: 'white',
@@ -1262,7 +1263,7 @@ function EmployeeAttendanceModule() {
                         Control Mode
                       </Typography>
                       <Chip
-                        label={controlStatus.control_mode === 'manual' ? '👤 Manual' : '⏰ Automatic'}
+                        label={controlStatus.control_mode === 'manual' ? '?? Manual' : '? Automatic'}
                         sx={{
                           bgcolor: 'rgba(255,255,255,0.25)',
                           color: 'white',
@@ -1283,7 +1284,7 @@ function EmployeeAttendanceModule() {
                 <Card>
                   <CardContent>
                     <Typography variant="h6" sx={{ mb: 2 }}>
-                      👤 Manual Control
+                      ?? Manual Control
                     </Typography>
                     <Typography variant="body2" color="textSecondary" sx={{ mb: 3 }}>
                       Directly control when employees can mark attendance
@@ -1297,7 +1298,7 @@ function EmployeeAttendanceModule() {
                         size="large"
                         onClick={handleManualOpen}
                         disabled={loading || controlStatus.current_status === 'open'}
-                        startIcon={<span>🔓</span>}
+                        startIcon={<span>??</span>}
                       >
                         {loading ? <CircularProgress size={24} /> : 'OPEN ATTENDANCE'}
                       </Button>
@@ -1308,7 +1309,7 @@ function EmployeeAttendanceModule() {
                         size="large"
                         onClick={handleManualClose}
                         disabled={loading || controlStatus.current_status === 'closed'}
-                        startIcon={<span>🔒</span>}
+                        startIcon={<span>??</span>}
                       >
                         {loading ? <CircularProgress size={24} /> : 'CLOSE ATTENDANCE'}
                       </Button>
@@ -1330,7 +1331,7 @@ function EmployeeAttendanceModule() {
                 <Card>
                   <CardContent>
                     <Typography variant="h6" sx={{ mb: 2 }}>
-                      ⏰ Automatic Schedule
+                      ? Automatic Schedule
                     </Typography>
                     <Typography variant="body2" color="textSecondary" sx={{ mb: 3 }}>
                       System automatically controls attendance based on time window
@@ -1369,7 +1370,7 @@ function EmployeeAttendanceModule() {
               <Card>
                 <CardContent>
                   <Typography variant="h6" sx={{ mb: 2 }}>
-                    ⚙️ Configuration
+                    ?? Configuration
                   </Typography>
                   <Typography variant="body2" color="textSecondary" sx={{ mb: 3 }}>
                     Change control mode and schedule settings
@@ -1382,8 +1383,8 @@ function EmployeeAttendanceModule() {
                       onChange={(e) => setControlMode(e.target.value)}
                       label="Control Mode"
                     >
-                      <MenuItem value="manual">👤 Manual Mode</MenuItem>
-                      <MenuItem value="automatic">⏰ Automatic Mode</MenuItem>
+                      <MenuItem value="manual">?? Manual Mode</MenuItem>
+                      <MenuItem value="automatic">? Automatic Mode</MenuItem>
                     </Select>
                   </FormControl>
 
@@ -1441,7 +1442,7 @@ function EmployeeAttendanceModule() {
               <Card>
                 <CardContent>
                   <Typography variant="h6" sx={{ mb: 2 }}>
-                    📊 Today's Summary
+                    ?? Today's Summary
                   </Typography>
                   <Typography variant="body2" color="textSecondary" sx={{ mb: 2 }}>
                     Employee attendance recorded today
@@ -1464,7 +1465,7 @@ function EmployeeAttendanceModule() {
                         onClick={loadControlStatus}
                         sx={{ mt: 2 }}
                       >
-                        🔄 Refresh Status
+                        ?? Refresh Status
                       </Button>
                     </Box>
                   )}
@@ -1481,7 +1482,7 @@ function EmployeeAttendanceModule() {
           <Card sx={{ mb: 3 }}>
             <CardContent>
               <Typography variant="h6" sx={{ mb: 2 }}>
-                🔍 Filter Attendance Records
+                ?? Filter Attendance Records
               </Typography>
 
               <Grid container spacing={2} sx={{ mb: 3 }}>
@@ -1603,7 +1604,7 @@ function EmployeeAttendanceModule() {
                       color="warning"
                       onClick={() => setOpenClearDialog(true)}
                     >
-                      📥 Export & Clear Today
+                      ?? Export & Clear Today
                     </Button>
                   </Box>
                 </Grid>
@@ -1627,7 +1628,7 @@ function EmployeeAttendanceModule() {
           <Card>
             <CardContent>
               <Typography variant="h6" sx={{ mb: 2 }}>
-                📊 Attendance Summary by Staff Type
+                ?? Attendance Summary by Staff Type
               </Typography>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
                 <Typography variant="body2" color="textSecondary">
@@ -1666,17 +1667,17 @@ function EmployeeAttendanceModule() {
                             <Grid container spacing={1}>
                               <Grid item xs={6}>
                                 <Typography variant="body2">
-                                  ✓ Present: <strong>{present}</strong>
+                                  ? Present: <strong>{present}</strong>
                                 </Typography>
                               </Grid>
                               <Grid item xs={6}>
                                 <Typography variant="body2">
-                                  ⏱ Late: <strong>{late}</strong>
+                                  ? Late: <strong>{late}</strong>
                                 </Typography>
                               </Grid>
                               <Grid item xs={6}>
                                 <Typography variant="body2">
-                                  ✗ Absent: <strong>{absent}</strong>
+                                  ? Absent: <strong>{absent}</strong>
                                 </Typography>
                               </Grid>
                               <Grid item xs={6}>
@@ -1700,16 +1701,16 @@ function EmployeeAttendanceModule() {
       {/* Clear Today's Attendance Dialog */}
       <Dialog open={openClearDialog} onClose={() => setOpenClearDialog(false)} maxWidth="sm" fullWidth>
         <DialogTitle sx={{ color: '#d32f2f', fontWeight: 'bold' }}>
-          📥 Export & Clear Today's Employee Attendance
+          ?? Export & Clear Today's Employee Attendance
         </DialogTitle>
         <DialogContent sx={{ pt: 2 }}>
           <Alert severity="info" sx={{ mb: 2 }}>
-            ℹ️ This will:<br/>
-            1️⃣ <strong>Export</strong> all employee attendance for today to CSV<br/>
-            2️⃣ <strong>Delete</strong> all records after export completes
+            ?? This will:<br/>
+            1?? <strong>Export</strong> all employee attendance for today to CSV<br/>
+            2?? <strong>Delete</strong> all records after export completes
           </Alert>
           <Alert severity="warning" sx={{ mb: 2 }}>
-            ⚠️ <strong>This cannot be undone!</strong> Ensure records are exported before proceeding.
+            ?? <strong>This cannot be undone!</strong> Ensure records are exported before proceeding.
           </Alert>
           <Typography variant="body2" sx={{ mb: 1 }}>
             <strong>Date:</strong> {new Date().toISOString().split('T')[0]}
@@ -1737,7 +1738,7 @@ function EmployeeAttendanceModule() {
                 Exporting & Clearing...
               </>
             ) : (
-              '📥 Export & Clear'
+              '?? Export & Clear'
             )}
           </Button>
         </DialogActions>
@@ -1747,3 +1748,5 @@ function EmployeeAttendanceModule() {
 }
 
 export default EmployeeAttendanceModule;
+
+

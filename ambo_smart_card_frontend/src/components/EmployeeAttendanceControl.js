@@ -1,4 +1,5 @@
-﻿import { API_URL } from '../config';
+import { API_URL } from '../config';
+import { getToken } from '../auth';
 
 import React, { useState, useEffect } from 'react';
 import './EmployeeAttendanceControl.css';
@@ -45,7 +46,7 @@ const EmployeeAttendanceControl = () => {
 
     const loadControlStatus = async () => {
         try {
-            const token = localStorage.getItem('token');
+            const token = getToken();
             const response = await fetch(`${API_URL}/api/employee-attendance-control/status`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -74,7 +75,7 @@ const EmployeeAttendanceControl = () => {
 
     const loadTodaySummary = async () => {
         try {
-            const token = localStorage.getItem('token');
+            const token = getToken();
             const response = await fetch(`${API_URL}/api/employee-attendance-control/today-summary`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -95,7 +96,7 @@ const EmployeeAttendanceControl = () => {
         setSuccess('');
 
         try {
-            const token = localStorage.getItem('token');
+            const token = getToken();
             const response = await fetch(`${API_URL}/api/employee-attendance-control/manual/open`, {
                 method: 'POST',
                 headers: {
@@ -124,7 +125,7 @@ const EmployeeAttendanceControl = () => {
         setSuccess('');
 
         try {
-            const token = localStorage.getItem('token');
+            const token = getToken();
             const response = await fetch(`${API_URL}/api/employee-attendance-control/manual/close`, {
                 method: 'POST',
                 headers: {
@@ -166,7 +167,7 @@ const EmployeeAttendanceControl = () => {
         setSuccess('');
 
         try {
-            const token = localStorage.getItem('token');
+            const token = getToken();
             const response = await fetch(`${API_URL}/api/employee-attendance-control/configure`, {
                 method: 'PUT',
                 headers: {
@@ -193,7 +194,7 @@ const EmployeeAttendanceControl = () => {
 
     const loadActionLogs = async () => {
         try {
-            const token = localStorage.getItem('token');
+            const token = getToken();
             const response = await fetch(`${API_URL}/api/employee-attendance-control/logs?limit=20`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -212,9 +213,9 @@ const EmployeeAttendanceControl = () => {
 
     const getStatusBadge = (currentStatus) => {
         if (currentStatus === 'open') {
-            return <span className="status-badge status-open">🟢 OPEN</span>;
+            return <span className="status-badge status-open">?? OPEN</span>;
         } else {
-            return <span className="status-badge status-closed">🔴 CLOSED</span>;
+            return <span className="status-badge status-closed">?? CLOSED</span>;
         }
     };
 
@@ -483,7 +484,7 @@ const EmployeeAttendanceControl = () => {
                                                 <td>{log.performed_by}</td>
                                                 <td>
                                                     {log.old_status && log.new_status && (
-                                                        <span>{log.old_status} → {log.new_status}</span>
+                                                        <span>{log.old_status} ? {log.new_status}</span>
                                                     )}
                                                 </td>
                                             </tr>
@@ -500,3 +501,5 @@ const EmployeeAttendanceControl = () => {
 };
 
 export default EmployeeAttendanceControl;
+
+

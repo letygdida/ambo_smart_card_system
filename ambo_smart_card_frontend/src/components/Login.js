@@ -1,4 +1,5 @@
 ﻿import { API_URL } from '../config';
+import { setSession } from '../auth';
 
 import { useState } from "react";
 
@@ -54,13 +55,8 @@ function Login() {
             const data = await response.json();
 
             if (response.ok && data.token) {
-                // Store token and user info in localStorage
-                localStorage.setItem("token", data.token);
-                localStorage.setItem("role", data.role);
-                localStorage.setItem("username", data.username);
-                if (data.student_id) {
-                    localStorage.setItem("student_id", data.student_id);
-                }
+                // Store token and user info using centralized auth helper
+                setSession(data.token, data.role, data.username, data.student_id);
 
                 console.log("Login successful - Role:", data.role);
 

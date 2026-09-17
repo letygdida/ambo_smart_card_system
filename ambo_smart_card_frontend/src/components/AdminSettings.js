@@ -1,4 +1,5 @@
-﻿import { API_URL } from '../config';
+import { API_URL } from '../config';
+import { getToken } from '../auth';
 
 import React, { useState, useEffect } from 'react';
 import {
@@ -73,7 +74,7 @@ function AdminSettings() {
     autoLogoutMinutes: 30
   });
 
-  const token = localStorage.getItem('token');
+  const token = getToken();
   const userRole = localStorage.getItem('role');
 
   // Fetch admin data on mount
@@ -140,14 +141,14 @@ function AdminSettings() {
       }
 
       const data = await response.json();
-      setSuccess('✅ Profile updated successfully');
+      setSuccess('? Profile updated successfully');
       setAdminData(data);
       setIsEditingProfile(false);
 
       // Clear message after 3 seconds
       setTimeout(() => setSuccess(''), 3000);
     } catch (err) {
-      setError(`❌ ${err.message}`);
+      setError(`? ${err.message}`);
       console.error('Update error:', err);
     } finally {
       setLoading(false);
@@ -197,7 +198,7 @@ function AdminSettings() {
         throw new Error(errData.message || 'Failed to change password');
       }
 
-      setSuccess('✅ Password changed successfully');
+      setSuccess('? Password changed successfully');
       setShowPasswordDialog(false);
       setPasswordData({
         currentPassword: '',
@@ -207,7 +208,7 @@ function AdminSettings() {
 
       setTimeout(() => setSuccess(''), 3000);
     } catch (err) {
-      setError(`❌ ${err.message}`);
+      setError(`? ${err.message}`);
       console.error('Password change error:', err);
     } finally {
       setLoading(false);
@@ -235,10 +236,10 @@ function AdminSettings() {
         throw new Error(errData.message || 'Failed to update settings');
       }
 
-      setSuccess('✅ Settings updated successfully');
+      setSuccess('? Settings updated successfully');
       setTimeout(() => setSuccess(''), 3000);
     } catch (err) {
-      setError(`❌ ${err.message}`);
+      setError(`? ${err.message}`);
       console.error('Settings update error:', err);
     } finally {
       setLoading(false);
@@ -282,7 +283,7 @@ function AdminSettings() {
   return (
     <Box sx={{ p: 3, bgcolor: '#f5f5f5', minHeight: '100vh' }}>
       <Typography variant="h4" sx={{ mb: 3, fontWeight: 'bold' }}>
-        ⚙️ Admin Settings
+        ?? Admin Settings
       </Typography>
 
       {error && (
@@ -308,9 +309,9 @@ function AdminSettings() {
           {/* Tabs */}
           <Paper sx={{ mb: 3 }}>
             <Tabs value={tabValue} onChange={(e, newValue) => setTabValue(newValue)}>
-              <Tab label="👤 Profile" icon={<PersonIcon />} iconPosition="start" />
-              <Tab label="🔐 Password & Security" icon={<LockIcon />} iconPosition="start" />
-              <Tab label="⚙️ System Settings" icon={<SettingsIcon />} iconPosition="start" />
+              <Tab label="?? Profile" icon={<PersonIcon />} iconPosition="start" />
+              <Tab label="?? Password & Security" icon={<LockIcon />} iconPosition="start" />
+              <Tab label="?? System Settings" icon={<SettingsIcon />} iconPosition="start" />
             </Tabs>
           </Paper>
 
@@ -454,7 +455,7 @@ function AdminSettings() {
                 <Card>
                   <CardContent>
                     <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold' }}>
-                      🔐 Change Password
+                      ?? Change Password
                     </Typography>
                     <Typography variant="body2" sx={{ mb: 2, color: 'textSecondary' }}>
                       Update your password to keep your account secure
@@ -476,14 +477,14 @@ function AdminSettings() {
                 <Card>
                   <CardContent>
                     <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold' }}>
-                      🛡️ Security Information
+                      ??? Security Information
                     </Typography>
                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
                       <Typography variant="body2">
                         <strong>Last Login:</strong> {adminData?.last_login || 'Never'}
                       </Typography>
                       <Typography variant="body2">
-                        <strong>Account Status:</strong> Active ✅
+                        <strong>Account Status:</strong> Active ?
                       </Typography>
                       <Typography variant="body2">
                         <strong>Role:</strong> Administrator
@@ -503,7 +504,7 @@ function AdminSettings() {
             <Card>
               <CardContent>
                 <Typography variant="h6" sx={{ mb: 3, fontWeight: 'bold' }}>
-                  ⚙️ System Settings
+                  ?? System Settings
                 </Typography>
 
                 <Grid container spacing={2}>
@@ -521,7 +522,7 @@ function AdminSettings() {
                           onChange={() => handleSettingToggle('emailNotifications')}
                         />
                       }
-                      label="📧 Email Notifications"
+                      label="?? Email Notifications"
                     />
                     <Typography variant="caption" sx={{ display: 'block', ml: 4, color: 'textSecondary' }}>
                       Receive email notifications for important events
@@ -536,7 +537,7 @@ function AdminSettings() {
                           onChange={() => handleSettingToggle('smsNotifications')}
                         />
                       }
-                      label="📱 SMS Notifications"
+                      label="?? SMS Notifications"
                     />
                     <Typography variant="caption" sx={{ display: 'block', ml: 4, color: 'textSecondary' }}>
                       Receive SMS alerts for critical issues
@@ -557,7 +558,7 @@ function AdminSettings() {
                           onChange={() => handleSettingToggle('twoFactorAuth')}
                         />
                       }
-                      label="🔐 Two-Factor Authentication"
+                      label="?? Two-Factor Authentication"
                     />
                     <Typography variant="caption" sx={{ display: 'block', ml: 4, color: 'textSecondary' }}>
                       Enable extra security layer for login
@@ -578,7 +579,7 @@ function AdminSettings() {
                           onChange={() => handleSettingToggle('darkMode')}
                         />
                       }
-                      label="🌙 Dark Mode"
+                      label="?? Dark Mode"
                     />
                     <Typography variant="caption" sx={{ display: 'block', ml: 4, color: 'textSecondary' }}>
                       Enable dark theme for the interface
@@ -593,7 +594,7 @@ function AdminSettings() {
                           onChange={() => handleSettingToggle('autoLogout')}
                         />
                       }
-                      label="⏱️ Auto-Logout"
+                      label="?? Auto-Logout"
                     />
                     <Typography variant="caption" sx={{ display: 'block', ml: 4, color: 'textSecondary' }}>
                       Automatically logout after inactivity
@@ -635,7 +636,7 @@ function AdminSettings() {
 
       {/* Change Password Dialog */}
       <Dialog open={showPasswordDialog} onClose={() => setShowPasswordDialog(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>🔐 Change Password</DialogTitle>
+        <DialogTitle>?? Change Password</DialogTitle>
         <DialogContent sx={{ pt: 2 }}>
           {error && (
             <Alert severity="error" sx={{ mb: 2 }}>
@@ -737,3 +738,5 @@ function AdminSettings() {
 }
 
 export default AdminSettings;
+
+

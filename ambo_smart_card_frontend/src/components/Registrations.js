@@ -1,4 +1,4 @@
-﻿import { API_URL } from '../config';
+import { API_URL } from '../config';
 
 import React, { useEffect, useState } from 'react';
 import SmartCardGenerator from './SmartCardGenerator';
@@ -382,7 +382,7 @@ function Registrations() {
                                                     color="primary" 
                                                     size="small"
                                                     onClick={() => handleRequestCard(registration)}
-                                                    startIcon="🎓"
+                                                    startIcon="??"
                                                 >
                                                     Request Card Generation
                                                 </Button>
@@ -404,7 +404,7 @@ function Registrations() {
                                                     {registration.smart_card_id ? (
                                                         <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
                                                             <Chip 
-                                                                label={`✅ CARD GENERATED: ${registration.smart_card_id}`}
+                                                                label={`? CARD GENERATED: ${registration.smart_card_id}`}
                                                                 sx={{ 
                                                                     backgroundColor: '#4caf50',
                                                                     color: 'white',
@@ -422,7 +422,7 @@ function Registrations() {
                                                                 }}
                                                                 sx={{ whiteSpace: 'nowrap' }}
                                                             >
-                                                                📄 View Card
+                                                                ?? View Card
                                                             </Button>
                                                         </Box>
                                                     ) : (
@@ -434,7 +434,7 @@ function Registrations() {
                                                                 setCardStudent(registration);
                                                                 setShowCardGenerator(true);
                                                             }}
-                                                            startIcon="🎓"
+                                                            startIcon="??"
                                                         >
                                                             Generate Card
                                                         </Button>
@@ -485,7 +485,7 @@ function Registrations() {
                         border: '1px solid #2196f3'
                     }}>
                         <Typography variant="body2" fontWeight="bold" color="primary">
-                            📧 University Email (Auto-assigned):
+                            ?? University Email (Auto-assigned):
                         </Typography>
                         <Typography variant="h6" color="primary" sx={{ mt: 1 }}>
                             registrar@ambou.edu.et

@@ -94,7 +94,7 @@ function approveWithEmail(id, university_email, res) {
     if (token) {
         try {
             const jwt = require('jsonwebtoken');
-            const decoded = jwt.verify(token, "smartcard_secret");
+            const decoded = getUserFromToken(token);
             approvedBy = decoded.username || decoded.student_id || "admin";
         } catch (e) {
             // Use default
@@ -204,7 +204,7 @@ router.post("/:id/reject", verifyToken, adminOnly, (req, res) => {
     if (token) {
         try {
             const jwt = require('jsonwebtoken');
-            const decoded = jwt.verify(token, "smartcard_secret");
+            const decoded = getUserFromToken(token);
             rejectedBy = decoded.username || decoded.student_id || "admin";
         } catch (e) {
             // Use default

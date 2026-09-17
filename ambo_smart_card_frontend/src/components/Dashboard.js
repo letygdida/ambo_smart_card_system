@@ -1,4 +1,4 @@
-﻿import { API_URL } from '../config';
+import { API_URL } from '../config';
 
 import { useEffect, useState } from "react";
 import {
@@ -68,13 +68,13 @@ function Dashboard() {
   }, [navigate]); // Re-fetch when navigation changes
 
   const fetchDashboardStats = async () => {
-    console.log('📊 fetchDashboardStats called');
+    console.log('?? fetchDashboardStats called');
     const apiUrl = `${API_URL}/api/dashboard/stats?t=${Date.now()}`;
-    console.log('📊 Calling:', apiUrl);
+    console.log('?? Calling:', apiUrl);
     
     try {
       const token = localStorage.getItem("token");
-      console.log('📊 Token:', token ? 'exists' : 'missing');
+      console.log('?? Token:', token ? 'exists' : 'missing');
       
       const response = await fetch(apiUrl, {
         headers: {
@@ -83,22 +83,22 @@ function Dashboard() {
         }
       });
 
-      console.log('📊 Response status:', response.status);
+      console.log('?? Response status:', response.status);
       
       if (response.ok) {
         const data = await response.json();
-        console.log('📊 Received data:', data);
+        console.log('?? Received data:', data);
         setStats(data);
       } else {
-        console.error('📊 Response not OK:', response.status, response.statusText);
+        console.error('?? Response not OK:', response.status, response.statusText);
         const text = await response.text();
-        console.error('📊 Response text:', text);
+        console.error('?? Response text:', text);
       }
     } catch (err) {
-      console.error("❌ Error fetching dashboard stats:", err);
-      console.error("❌ Error details:", err.message, err.stack);
+      console.error("? Error fetching dashboard stats:", err);
+      console.error("? Error details:", err.message, err.stack);
     } finally {
-      console.log('📊 Setting statsLoading to false');
+      console.log('?? Setting statsLoading to false');
       setStatsLoading(false);
     }
   };
@@ -242,7 +242,7 @@ function Dashboard() {
                       fontSize: '48px',
                       color: '#9e9e9e'
                     }}>
-                      👤
+                      ??
                     </Box>
                   </Box>
                 )}
@@ -298,13 +298,13 @@ function Dashboard() {
                   Quick Links
                 </Typography>
                 <Typography color="textSecondary">
-                  • View your attendance records
+                  � View your attendance records
                 </Typography>
                 <Typography color="textSecondary">
-                  • Download your card details
+                  � Download your card details
                 </Typography>
                 <Typography color="textSecondary">
-                  • Update your profile information
+                  � Update your profile information
                 </Typography>
               </CardContent>
             </Card>
@@ -379,3 +379,4 @@ function Dashboard() {
 }
 
 export default Dashboard;
+

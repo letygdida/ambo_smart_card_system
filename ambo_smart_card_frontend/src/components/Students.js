@@ -1,4 +1,4 @@
-﻿import { API_URL } from '../config';
+import { API_URL } from '../config';
 
 import { useEffect, useState, useCallback } from "react";
 import {
@@ -78,11 +78,11 @@ function Students(){
         )
         .then(res => res.json())
         .then(data => {
-            console.log('📚 Students loaded:', data);
+            console.log('?? Students loaded:', data);
             
             if(Array.isArray(data)){
                 setStudents(data);
-                console.log(`✅ Loaded ${data.length} students`);
+                console.log(`? Loaded ${data.length} students`);
             }
             else{
                 setStudents([]);
@@ -90,7 +90,7 @@ function Students(){
             setFetchLoading(false);
         })
         .catch(err => {
-            console.error('❌ Error loading students:', err);
+            console.error('? Error loading students:', err);
             setStudents([]);
             setFetchLoading(false);
         });
@@ -212,7 +212,7 @@ function Students(){
 
         const method = editId ? "PUT" : "POST";
         
-        console.log(`📤 Submitting ${method} request (${editId ? 'UPDATE' : 'ADD'}) for student:`, {
+        console.log(`?? Submitting ${method} request (${editId ? 'UPDATE' : 'ADD'}) for student:`, {
             student_id: form.student_id,
             name: form.name,
             department: form.department,
@@ -241,7 +241,7 @@ function Students(){
             return res.json();
         })
         .then(data => {
-            console.log("✅ Response data:", data);
+            console.log("? Response data:", data);
             
             if(data.error){
                 alert("Error: " + data.error);
@@ -253,9 +253,9 @@ function Students(){
             setTimeout(() => setSuccessMessage(""), 4000);
             
             // Reload students after a delay to ensure database write completes
-            console.log('⏳ Waiting 800ms before refreshing student list...');
+            console.log('? Waiting 800ms before refreshing student list...');
             setTimeout(() => {
-                console.log('🔄 Reloading students...');
+                console.log('?? Reloading students...');
                 loadStudents();
                 clearForm();
             }, 800);
@@ -263,7 +263,7 @@ function Students(){
             setIsLoading(false);
         })
         .catch(err => {
-            console.error("❌ Error:", err);
+            console.error("? Error:", err);
             alert("Error saving student: " + err.message);
             setIsLoading(false);
         });
@@ -291,7 +291,7 @@ function Students(){
         
         setShowForm(true);
         
-        console.log(`✏️ Editing student:`, {
+        console.log(`?? Editing student:`, {
             id: student.id,
             student_id: student.student_id,
             name: student.username || student.full_name,
@@ -314,9 +314,9 @@ function Students(){
         setDeleteConfirmId(null);
         setErrorMessage("");
         
-        console.log(`🗑️ Starting delete process for student ID: ${id}`);
-        console.log(`📤 Sending DELETE request to: ${API_URL}/api/students/${id}`);
-        console.log(`🔐 Authorization token: ${token ? '✓ Present' : '✗ Missing'}`);
+        console.log(`??? Starting delete process for student ID: ${id}`);
+        console.log(`?? Sending DELETE request to: ${API_URL}/api/students/${id}`);
+        console.log(`?? Authorization token: ${token ? '? Present' : '? Missing'}`);
 
         fetch(
             `${API_URL}/api/students/${id}`,
@@ -329,18 +329,18 @@ function Students(){
             }
         )
         .then(res => {
-            console.log('📨 Delete response received');
+            console.log('?? Delete response received');
             console.log('   Status:', res.status, res.statusText);
             console.log('   Content-Type:', res.headers.get('content-type'));
             
             // Check if response has content
             if (res.status === 204) {
-                console.log('✅ No content response (204)');
+                console.log('? No content response (204)');
                 return { success: true, message: "Student deleted successfully" };
             }
             
             if (!res.ok) {
-                console.error('❌ Non-OK response received');
+                console.error('? Non-OK response received');
                 if(res.status === 403){
                     throw new Error("Access denied. Only administrators can delete students.");
                 }
@@ -357,42 +357,42 @@ function Students(){
             const contentType = res.headers.get('content-type');
             if (contentType && contentType.includes('application/json')) {
                 return res.json().then(data => {
-                    console.log('📦 JSON response parsed:', data);
+                    console.log('?? JSON response parsed:', data);
                     return data;
                 });
             } else {
-                console.log('⚠️ Response is not JSON, returning success message');
+                console.log('?? Response is not JSON, returning success message');
                 return { success: true, message: "Student deleted successfully" };
             }
         })
         .then(data => {
-            console.log('✅ Delete operation completed');
+            console.log('? Delete operation completed');
             console.log('   Response data:', data);
             
             setDeleteLoading(false);
             
             const message = data.message || data.success || "Student deleted successfully";
-            console.log('🎉 Success message:', message);
+            console.log('?? Success message:', message);
             
             setSuccessMessage(message);
             setTimeout(() => setSuccessMessage(""), 4000);
             
             // Reload students after a short delay to ensure database update completes
-            console.log('⏳ Waiting 300ms before reloading student list...');
+            console.log('? Waiting 300ms before reloading student list...');
             setTimeout(() => {
-                console.log('🔄 Reloading student list...');
+                console.log('?? Reloading student list...');
                 loadStudents();
             }, 300);
         })
         .catch(err => {
-            console.error('❌ Delete error caught:', err);
+            console.error('? Delete error caught:', err);
             console.error('   Error message:', err.message);
             console.error('   Error stack:', err.stack);
             
             setDeleteLoading(false);
             
             const errorMsg = err.message || "Unknown error occurred while deleting student";
-            console.log('⚠️ Setting error message:', errorMsg);
+            console.log('?? Setting error message:', errorMsg);
             
             setErrorMessage(errorMsg);
             setTimeout(() => setErrorMessage(""), 5000);
@@ -406,7 +406,7 @@ function Students(){
         const newStatus = student.status === 'blocked' ? 'active' : 'blocked';
         const actionText = newStatus === 'blocked' ? 'block' : 'unblock';
         
-        console.log(`🔄 Toggling status for student ${student.id} (${student.student_id}): ${student.status} → ${newStatus}`);
+        console.log(`?? Toggling status for student ${student.id} (${student.student_id}): ${student.status} ? ${newStatus}`);
         
         fetch(`${API_URL}/api/students/${student.id}/status`, {
             method: 'PUT',
@@ -429,7 +429,7 @@ function Students(){
             return res.json();
         })
         .then(data => {
-            console.log('✅ Status update response:', data);
+            console.log('? Status update response:', data);
             setSuccessMessage(data.message || `Student ${actionText === 'block' ? 'blocked' : 'unblocked'} successfully`);
             setTimeout(() => setSuccessMessage(""), 4000);
             
@@ -439,7 +439,7 @@ function Students(){
             }, 300);
         })
         .catch(err => {
-            console.error('❌ Status update error:', err);
+            console.error('? Status update error:', err);
             alert('Error updating status: ' + err.message);
         });
     };
@@ -477,7 +477,7 @@ function Students(){
             {/* Header */}
             <Box sx={{ marginBottom: "30px" }}>
                 <Typography variant="h4" sx={{ fontWeight: "bold", marginBottom: "10px" }}>
-                    👥 Student Management
+                    ?? Student Management
                 </Typography>
                 <Typography variant="body2" sx={{ color: "#666" }}>
                     Manage student records, update information, and control access
@@ -559,7 +559,7 @@ function Students(){
                 fullWidth
             >
                 <DialogTitle sx={{ backgroundColor: "#3f51b5", color: "white", fontWeight: "bold" }}>
-                    {editId ? "✏️ Edit Student" : "➕ Add New Student"}
+                    {editId ? "?? Edit Student" : "? Add New Student"}
                 </DialogTitle>
                 
                 <DialogContent sx={{ paddingTop: "20px" }}>
@@ -652,7 +652,7 @@ function Students(){
 
                     <Box sx={{ margin: "20px 0" }}>
                         <Typography variant="subtitle2" sx={{ marginBottom: "10px", fontWeight: "bold" }}>
-                            📷 Student Photo
+                            ?? Student Photo
                         </Typography>
                         <input
                             type="file"
@@ -704,7 +704,7 @@ function Students(){
                 onClose={() => !deleteLoading && setDeleteDialogOpen(false)}
             >
                 <DialogTitle sx={{ color: "#d32f2f", fontWeight: "bold" }}>
-                    🗑️ Delete Student
+                    ??? Delete Student
                 </DialogTitle>
                 <DialogContent>
                     <Typography sx={{ marginTop: "15px" }}>
@@ -739,7 +739,7 @@ function Students(){
 
             {/* Students Table */}
             <Typography variant="h6" sx={{ marginBottom: "15px", fontWeight: "bold" }}>
-                📋 Students List ({filteredStudents.length})
+                ?? Students List ({filteredStudents.length})
             </Typography>
 
             <TableContainer component={Paper} sx={{ boxShadow: "0 2px 8px rgba(0,0,0,0.1)" }}>
@@ -806,12 +806,12 @@ function Students(){
                                             </Typography>
                                             {student.personal_email && (
                                                 <Typography sx={{ fontSize: '12px', color: '#666' }}>
-                                                    📧 {student.personal_email}
+                                                    ?? {student.personal_email}
                                                 </Typography>
                                             )}
                                             {student.phone_number && (
                                                 <Typography sx={{ fontSize: '12px', color: '#666' }}>
-                                                    📱 {student.phone_number}
+                                                    ?? {student.phone_number}
                                                 </Typography>
                                             )}
                                         </Box>
@@ -832,7 +832,7 @@ function Students(){
                                     <TableCell sx={{ textAlign: "center" }}>
                                         <Chip
                                             icon={student.status === 'active' ? <CheckCircleIcon /> : <BlockIcon />}
-                                            label={student.status === 'blocked' ? '🔒 Blocked' : '✓ Active'}
+                                            label={student.status === 'blocked' ? '?? Blocked' : '? Active'}
                                             color={student.status === 'active' ? 'success' : 'error'}
                                             variant="filled"
                                             size="small"
@@ -897,3 +897,4 @@ function Students(){
 }
 
 export default Students;
+

@@ -1,4 +1,5 @@
 const jwt = require("jsonwebtoken");
+const config = require("./config");
 
 // VERIFY TOKEN MIDDLEWARE
 const verifyToken = (req, res, next) => {
@@ -17,7 +18,7 @@ const verifyToken = (req, res, next) => {
     }
 
     try {
-        const decoded = jwt.verify(token, "smartcard_secret");
+        const decoded = jwt.verify(token, config.JWT_SECRET);
         req.user = decoded;
         console.log("Token verified for user:", decoded.username, "Role:", decoded.role);
         next();

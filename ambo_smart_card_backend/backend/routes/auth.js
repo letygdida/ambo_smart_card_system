@@ -6,6 +6,17 @@ const path = require("path");
 const fs = require("fs");
 
 const db = require("../db");
+const config = require("../config");
+
+// Helper function to verify token and extract user info
+function getUserFromToken(token) {
+    if (!token) return null;
+    try {
+        return jwt.verify(token, config.JWT_SECRET);
+    } catch (e) {
+        return null;
+    }
+}
 
 const router = express.Router();
 
@@ -75,8 +86,8 @@ router.post("/login", (req, res) => {
                 role: user.role,
                 student_id: user.student_id
             },
-            "smartcard_secret",
-            { expiresIn: "1h" }
+            config.JWT_SECRET,
+            { expiresIn: config.JWT_EXPIRES_IN }
         );
 
         console.log("Login successful for:", username, "Role:", user.role);
@@ -183,7 +194,7 @@ router.post("/complete-profile", registrationUpload.fields([
             return res.status(401).json({ error: "Not authenticated" });
         }
 
-        const decoded = jwt.verify(token, "smartcard_secret");
+        const decoded = getUserFromToken(token);
         const studentId = decoded.student_id;
 
         const {
@@ -290,7 +301,7 @@ router.get("/profile-status", (req, res) => {
     }
 
     try {
-        const decoded = jwt.verify(token, "smartcard_secret");
+        const decoded = getUserFromToken(token);
         const studentId = decoded.student_id;
 
         db.query(
@@ -326,7 +337,7 @@ router.get("/profile", (req, res) => {
     }
 
     try {
-        const decoded = jwt.verify(token, "smartcard_secret");
+        const decoded = getUserFromToken(token);
         const studentId = decoded.student_id;
 
         db.query(
@@ -374,7 +385,7 @@ router.put("/profile", registrationUpload.fields([
             return res.status(401).json({ error: "Not authenticated" });
         }
 
-        const decoded = jwt.verify(token, "smartcard_secret");
+        const decoded = getUserFromToken(token);
         const studentId = decoded.student_id;
 
         const {
@@ -485,7 +496,7 @@ router.post("/upload-photo", registrationUpload.single('photo'), (req, res) => {
             return res.status(401).json({ error: "Not authenticated" });
         }
 
-        const decoded = jwt.verify(token, "smartcard_secret");
+        const decoded = getUserFromToken(token);
         const studentId = decoded.student_id;
 
         if (!req.file) {

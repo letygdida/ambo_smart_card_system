@@ -1,4 +1,5 @@
-﻿import { API_URL } from '../config';
+import { API_URL } from '../config';
+import { getToken } from '../auth';
 
 import React, { useState, useEffect } from 'react';
 import {
@@ -64,7 +65,7 @@ function AttendanceModule() {
   const [liveActivity, setLiveActivity] = useState([]);
   const [markStudentId, setMarkStudentId] = useState('');
   const [markedStudent, setMarkedStudent] = useState(null);
-  const token = localStorage.getItem('token');
+  const token = getToken().getItem('token');
 
   useEffect(() => {
     fetchTodayAttendance();
@@ -442,7 +443,7 @@ function AttendanceModule() {
           <Card sx={{ mb: 3 }}>
             <CardContent>
               <Typography variant="h6" sx={{ mb: 2 }}>
-                📋 Mark Attendance by Student ID
+                ?? Mark Attendance by Student ID
               </Typography>
               <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
                 <TextField
@@ -467,7 +468,7 @@ function AttendanceModule() {
               {success && (
                 <Alert severity="success" sx={{ mb: 2 }}>
                   <Typography variant="body2">
-                    <strong>✓ {success}</strong>
+                    <strong>? {success}</strong>
                   </Typography>
                   {markedStudent && (
                     <Box sx={{ mt: 1 }}>
@@ -619,10 +620,10 @@ function AttendanceModule() {
                       {rec.check_in_time}
                     </Typography>
                     <Typography variant="subtitle2">
-                      ✓ {rec.person_name}
+                      ? {rec.person_name}
                     </Typography>
                     <Typography variant="caption" color="textSecondary">
-                      {rec.person_type === 'student' ? 'Student' : 'Employee'} • {rec.department_name}
+                      {rec.person_type === 'student' ? 'Student' : 'Employee'} � {rec.department_name}
                     </Typography>
                   </Box>
                   <Chip

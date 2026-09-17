@@ -1,5 +1,6 @@
 ﻿import { Link, Outlet, useNavigate } from "react-router-dom";
 import { useState, useEffect, useContext } from "react";
+import { clearSession } from "../auth";
 
 import {
   IconButton,
@@ -47,10 +48,7 @@ function Layout() {
   }, []);
 
   const logout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("role");
-    localStorage.removeItem("username");
-    localStorage.removeItem("student_id");
+    clearSession();
     localStorage.removeItem("profileCompleted");
     navigate("/login");
   };

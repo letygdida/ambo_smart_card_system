@@ -1,4 +1,5 @@
-﻿import { API_URL } from '../config';
+import { API_URL } from '../config';
+import { getToken } from '../auth';
 
 import React, { useEffect, useState } from 'react';
 import {
@@ -55,7 +56,7 @@ function CafeteriaAttendanceReports() {
   const [scanStudentId, setScanStudentId] = useState('');
   const [scanning, setScanning] = useState(false);
 
-  const token = localStorage.getItem('token');
+  const token = getToken();
   const userRole = localStorage.getItem('role');
 
   // Check authorization
@@ -110,7 +111,7 @@ function CafeteriaAttendanceReports() {
       const data = JSON.parse(text);
       setMealStatus(data);
     } catch (err) {
-      console.error('❌ Meal status fetch error:', err);
+      console.error('? Meal status fetch error:', err);
       setError('Failed to fetch meal status. Please ensure cafeteria backend routes are available.');
     }
   };
@@ -135,7 +136,7 @@ function CafeteriaAttendanceReports() {
         setTodaySummary(data);
       }
     } catch (err) {
-      console.error('❌ Today summary fetch error:', err);
+      console.error('? Today summary fetch error:', err);
       setError('Failed to fetch today summary. Please ensure cafeteria backend routes are available.');
     }
   };
@@ -176,7 +177,7 @@ function CafeteriaAttendanceReports() {
         setError(data.error || 'Failed to fetch cafeteria records');
       }
     } catch (err) {
-      console.error('❌ Records fetch error:', err);
+      console.error('? Records fetch error:', err);
       setError(`Error: ${err.message}. Please ensure cafeteria backend routes are running.`);
     } finally {
       setLoading(false);
@@ -209,7 +210,7 @@ function CafeteriaAttendanceReports() {
       const data = await response.json();
 
       if (response.ok) {
-        setMessage(`✅ ${data.message}`);
+        setMessage(`? ${data.message}`);
         setScanStudentId('');
         setOpenScanDialog(false);
         setTimeout(() => {
@@ -217,10 +218,10 @@ function CafeteriaAttendanceReports() {
           fetchRecords();
         }, 500);
       } else {
-        setMessage(`❌ ${data.error || data.message}`);
+        setMessage(`? ${data.error || data.message}`);
       }
     } catch (err) {
-      setMessage(`❌ Error: ${err.message}`);
+      setMessage(`? Error: ${err.message}`);
     } finally {
       setScanning(false);
     }
@@ -284,7 +285,7 @@ function CafeteriaAttendanceReports() {
   return (
     <div style={{ padding: '30px' }}>
       <Typography variant="h4" sx={{ mb: 3, fontWeight: 'bold' }}>
-        🍽️ Cafeteria Attendance Reports
+        ??? Cafeteria Attendance Reports
       </Typography>
 
       {error && (
@@ -294,7 +295,7 @@ function CafeteriaAttendanceReports() {
       )}
 
       {message && (
-        <Alert severity={message.includes('✅') ? 'success' : 'warning'} sx={{ mb: 2 }}>
+        <Alert severity={message.includes('?') ? 'success' : 'warning'} sx={{ mb: 2 }}>
           {message}
         </Alert>
       )}
@@ -310,7 +311,7 @@ function CafeteriaAttendanceReports() {
                 color="primary"
                 onClick={() => setOpenScanDialog(true)}
               >
-                📱 Manual Scan
+                ?? Manual Scan
               </Button>
             </Box>
 
@@ -329,11 +330,11 @@ function CafeteriaAttendanceReports() {
                       {key}
                     </Typography>
                     <Typography variant="body2" sx={{ color: 'textSecondary' }}>
-                      {meal.start_time} – {meal.end_time}
+                      {meal.start_time} � {meal.end_time}
                     </Typography>
                     <Box sx={{ mt: 1 }}>
                       <Chip
-                        label={meal.is_open ? '✅ OPEN' : '🔒 CLOSED'}
+                        label={meal.is_open ? '? OPEN' : '?? CLOSED'}
                         color={meal.is_open ? 'success' : 'default'}
                         size="small"
                         sx={{ fontWeight: 'bold' }}
@@ -554,7 +555,7 @@ function CafeteriaAttendanceReports() {
                       <TableCell>{record.scan_time}</TableCell>
                       <TableCell>
                         <Chip
-                          label={record.attendance_status === 'attended' ? '✅ Attended' : '❌ Rejected'}
+                          label={record.attendance_status === 'attended' ? '? Attended' : '? Rejected'}
                           color={getStatusColor(record.attendance_status)}
                           size="small"
                           variant="outlined"
@@ -583,7 +584,7 @@ function CafeteriaAttendanceReports() {
 
       {/* Manual Scan Dialog */}
       <Dialog open={openScanDialog} onClose={() => setOpenScanDialog(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>📱 Manual Cafeteria Scan</DialogTitle>
+        <DialogTitle>?? Manual Cafeteria Scan</DialogTitle>
         <DialogContent sx={{ pt: 2 }}>
           <TextField
             fullWidth
@@ -599,7 +600,7 @@ function CafeteriaAttendanceReports() {
             }}
           />
           {message && (
-            <Alert severity={message.includes('✅') ? 'success' : 'error'} sx={{ mt: 2 }}>
+            <Alert severity={message.includes('?') ? 'success' : 'error'} sx={{ mt: 2 }}>
               {message}
             </Alert>
           )}
@@ -620,3 +621,4 @@ function CafeteriaAttendanceReports() {
 }
 
 export default CafeteriaAttendanceReports;
+
