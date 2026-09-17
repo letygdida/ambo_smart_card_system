@@ -126,8 +126,10 @@ app.get("/", (req,res)=>{
     res.send("Ambo University Smart Card API Running");
 });
 
-app.listen(5000,()=>{
-    console.log("Server running on port 5000");
+// Use RENDER_PORT or PORT for Render, default to 5000 for local development
+const PORT = process.env.PORT || process.env.RENDER_PORT || 5000;
+app.listen(PORT,()=>{
+    console.log(`Server running on port ${PORT}`);
     
     // Start automatic attendance scheduler
     console.log("\n=== Starting Attendance Automation ===");

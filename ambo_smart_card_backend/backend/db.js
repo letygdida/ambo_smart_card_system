@@ -1,16 +1,21 @@
 const mysql = require("mysql2");
+require("dotenv").config();
 
 // Create a connection pool for better stability
+// Environment variables take precedence, with sensible defaults for local development
 const pool = mysql.createPool({
-    host: "localhost",
-    user: "root",
-    password: "",
-    database: "ambo_smart_card",
-    port: 3306,
+    host: process.env.DB_HOST || "localhost",
+    user: process.env.DB_USER || "root",
+    password: process.env.DB_PASSWORD || "",
+    database: process.env.DB_NAME || "ambo_smart_card",
+    port: process.env.DB_PORT ? parseInt(process.env.DB_PORT) : 3306,
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0,
-    enableKeepAlive: true
+    enableKeepAlive: true,
+    ssl: process.env.DB_SSL === 'true' ? {
+        rejectUnauthorized: true
+    } : undefined
 });
 
 // Handle pool errors
