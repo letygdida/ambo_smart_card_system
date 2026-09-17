@@ -416,7 +416,7 @@ function CafeteriaAttendanceDashboard() {
                   color={meal.is_open ? 'warning' : 'success'}
                   size="small"
                   onClick={() => handleMealControl(mealType, 'open')}
-                  disabled={meal.is_open || !mealStatus?.currentMeal}
+                  disabled={meal.manual_status === 'open'}
                   sx={{ mr: 0.5 }}
                 >
                   Open
@@ -426,7 +426,7 @@ function CafeteriaAttendanceDashboard() {
                   color={!meal.is_open ? 'warning' : 'error'}
                   size="small"
                   onClick={() => handleMealControl(mealType, 'close')}
-                  disabled={!meal.is_open}
+                  disabled={meal.manual_status === 'close'}
                   sx={{ ml: 0.5 }}
                 >
                   Close
