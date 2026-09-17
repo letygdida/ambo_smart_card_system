@@ -310,7 +310,8 @@ router.post("/request-card", verifyToken, (req, res) => {
     }
 
     try {
-        const decoded = require('jsonwebtoken').verify(token, "smartcard_secret");
+        const config = require("../config");
+        const decoded = require('jsonwebtoken').verify(token, config.JWT_SECRET);
         const studentId = decoded.student_id;
 
         // Check if student is approved
