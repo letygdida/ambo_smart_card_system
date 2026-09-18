@@ -7,12 +7,23 @@ const fs = require('fs');
 const path = require('path');
 const xlsx = require('xlsx');
 
+// Allow both admin and staff to manage employees
+const adminOrStaff = (req, res, next) => {
+    if (!req.user) {
+        return res.status(401).json({ error: 'Authentication required' });
+    }
+    if (req.user.role !== 'admin' && req.user.role !== 'staff') {
+        return res.status(403).json({ error: 'Access denied. Admin or Staff required.' });
+    }
+    next();
+};
+
 // =====================================================
 // EMPLOYEE MANAGEMENT ENDPOINTS
 // =====================================================
 
 // GET all employees (Admin only)
-router.get('/', verifyToken, adminOnly, (req, res) => {
+router.get('/', verifyToken, adminOrStaff, (req, res) => {
   const { search, department, status, page = 1, limit = 20 } = req.query;
   
   let query = `
@@ -117,7 +128,7 @@ router.get('/:employeeId', verifyToken, (req, res) => {
 });
 
 // CREATE new employee (Admin only) - JSON with base64 photo
-router.post('/', verifyToken, adminOnly, async (req, res) => {
+router.post('/', verifyToken, adminOrStaff, async (req, res) => {
   try {
     const data = req.body || {};
     
@@ -238,7 +249,7 @@ router.post('/', verifyToken, adminOnly, async (req, res) => {
 });
 
 // UPDATE employee (Admin only) - JSON with base64 photo
-router.put('/:employeeId', verifyToken, adminOnly, async (req, res) => {
+router.put('/:employeeId', verifyToken, adminOrStaff, async (req, res) => {
   try {
     const { employeeId } = req.params;
     const data = req.body || {};
@@ -344,7 +355,7 @@ router.put('/:employeeId', verifyToken, adminOnly, async (req, res) => {
 });
 
 // DEACTIVATE employee (Admin only)
-router.post('/:employeeId/deactivate', verifyToken, adminOnly, (req, res) => {
+router.post('/:employeeId/deactivate', verifyToken, adminOrStaff, (req, res) => {
   const { employeeId } = req.params;
   const decodedEmployeeId = decodeURIComponent(employeeId);
 
@@ -377,7 +388,7 @@ router.post('/:employeeId/deactivate', verifyToken, adminOnly, (req, res) => {
 });
 
 // REACTIVATE employee (Admin only)
-router.post('/:employeeId/reactivate', verifyToken, adminOnly, (req, res) => {
+router.post('/:employeeId/reactivate', verifyToken, adminOrStaff, (req, res) => {
   const { employeeId } = req.params;
   const decodedEmployeeId = decodeURIComponent(employeeId);
 
@@ -410,7 +421,7 @@ router.post('/:employeeId/reactivate', verifyToken, adminOnly, (req, res) => {
 });
 
 // GENERATE SMART CARD (Admin only)
-router.post('/:employeeId/generate-card', verifyToken, adminOnly, async (req, res) => {
+router.post('/:employeeId/generate-card', verifyToken, adminOrStaff, async (req, res) => {
   const { employeeId } = req.params;
   const decodedEmployeeId = decodeURIComponent(employeeId);
 
@@ -512,7 +523,7 @@ router.get('/:employeeId/card', verifyToken, (req, res) => {
 });
 
 // REPLACE smart card (Admin only)
-router.post('/:employeeId/replace-card', verifyToken, adminOnly, async (req, res) => {
+router.post('/:employeeId/replace-card', verifyToken, adminOrStaff, async (req, res) => {
   const { employeeId } = req.params;
   const decodedEmployeeId = decodeURIComponent(employeeId);
   const { reason } = req.body;
@@ -647,7 +658,7 @@ router.get('/:employeeId/activity-logs', verifyToken, (req, res) => {
 });
 
 // IMPORT employees from Excel (Admin only)
-router.post('/import/bulk', verifyToken, adminOnly, async (req, res) => {
+router.post('/import/bulk', verifyToken, adminOrStaff, async (req, res) => {
   try {
     if (!req.files || !req.files.file) {
       return res.status(400).json({ error: 'No file uploaded' });
@@ -786,7 +797,7 @@ router.post('/import/bulk', verifyToken, adminOnly, async (req, res) => {
 });
 
 // DELETE employee (Admin only)
-router.delete('/:employeeId', verifyToken, adminOnly, (req, res) => {
+router.delete('/:employeeId', verifyToken, adminOrStaff, (req, res) => {
   const { employeeId } = req.params;
   const decodedEmployeeId = decodeURIComponent(employeeId);
 
@@ -853,7 +864,7 @@ router.delete('/:employeeId', verifyToken, adminOnly, (req, res) => {
 });
 
 // GET employee dashboard statistics
-router.get('/dashboard/stats', verifyToken, adminOnly, (req, res) => {
+router.get('/dashboard/stats', verifyToken, adminOrStaff, (req, res) => {
   const statsQuery = `
     SELECT 
       COUNT(*) as total,

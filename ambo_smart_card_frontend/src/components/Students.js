@@ -197,37 +197,50 @@ function Students(){
             ? `${API_URL}/api/students/${editId}`
             : `${API_URL}/api/students/add`;
 
-        const formData = new FormData();
-        formData.append("student_id", form.student_id);
-        formData.append("name", form.name);
-        formData.append("department", form.department);
-        formData.append("year", form.year);
-        formData.append("personal_email", form.personal_email);
-        formData.append("phone_number", form.phone_number);
-        formData.append("emergency_contact", form.emergency_contact);
-
-        if(form.photo){
-            formData.append("photo", form.photo);
-        }
-
-        const method = editId ? "PUT" : "POST";
-        
-        console.log(`?? Submitting ${method} request (${editId ? 'UPDATE' : 'ADD'}) for student:`, {
+        console.log(`Submitting ${editId ? 'PUT' : 'POST'} for student:`, {
             student_id: form.student_id,
             name: form.name,
             department: form.department,
-            year: form.year,
-            hasPhoto: !!form.photo,
-            editId: editId
+            year: form.year
         });
 
-        fetch(url, {
-            method: method,
-            headers:{
-                Authorization: "Bearer " + token
-            },
-            body: formData
-        })
+        // Add new student: send JSON (no photo on creation)
+        // Edit student: send FormData so photo can be included
+        let fetchOptions;
+        if (!editId) {
+            fetchOptions = {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Bearer ' + token,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    student_id: form.student_id,
+                    name: form.name,
+                    department: form.department,
+                    year: String(form.year),
+                    personal_email: form.personal_email || '',
+                    phone_number: form.phone_number || '',
+                    emergency_contact: form.emergency_contact || ''
+                })
+            };
+        } else {
+            const formData = new FormData();
+            formData.append("name", form.name);
+            formData.append("department", form.department);
+            formData.append("year", String(form.year));
+            formData.append("personal_email", form.personal_email || '');
+            formData.append("phone_number", form.phone_number || '');
+            formData.append("emergency_contact", form.emergency_contact || '');
+            if (form.photo) { formData.append("photo", form.photo); }
+            fetchOptions = {
+                method: 'PUT',
+                headers: { 'Authorization': 'Bearer ' + token },
+                body: formData
+            };
+        }
+
+        fetch(url, fetchOptions)
         .then(res => {
             console.log('Response status:', res.status);
             if (!res.ok) {

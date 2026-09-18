@@ -76,34 +76,25 @@ router.get("/", verifyToken, (req, res) => {
     );
 });
 
-// ===== POST - ADD NEW STUDENT =====
-router.post("/add", verifyToken, upload.fields([
-    { name: 'photo', maxCount: 1 }
-]), (req, res) => {
+// ===== POST - ADD NEW STUDENT (accepts JSON body — no photo on creation) =====
+router.post("/add", verifyToken, (req, res) => {
     console.log('POST /api/students/add - Adding new student');
-    
-    // Parse FormData fields
-    const student_id = req.body.student_id;
-    const name = req.body.name;
-    const department = req.body.department;
-    const year = req.body.year;
-    const personal_email = req.body.personal_email || '';
-    const phone_number = req.body.phone_number || '';
-    const emergency_contact = req.body.emergency_contact || '';
+    console.log('Content-Type:', req.headers['content-type']);
+    console.log('Body received:', JSON.stringify(req.body));
 
-    let photoFilename = null;
+    const student_id = (req.body.student_id || '').toString().trim();
+    const name = (req.body.name || '').toString().trim();
+    const department = (req.body.department || '').toString().trim();
+    const year = (req.body.year || '').toString().trim();
+    const personal_email = (req.body.personal_email || '').toString().trim();
+    const phone_number = (req.body.phone_number || '').toString().trim();
+    const emergency_contact = (req.body.emergency_contact || '').toString().trim();
+    const photoFilename = null; // photo added later via PUT /api/students/:id
 
-    // Handle file upload if present
-    // multer (upload.fields) already saves the file to disk via diskStorage.
-    // req.files.photo is an array of multer file objects — use [0].filename directly.
-    if (req.files && req.files.photo && req.files.photo.length > 0) {
-        photoFilename = req.files.photo[0].filename;
-        console.log(`📸 Photo saved by multer: ${photoFilename}`);
-    }
-
-    console.log(`➕ ADD STUDENT request: ${student_id} - ${name}`);
+    console.log(`➕ ADD STUDENT: id="${student_id}" name="${name}" dept="${department}" year="${year}"`);
 
     if (!student_id || !name || !department || !year) {
+        console.error('Validation failed — missing fields:', { student_id, name, department, year });
         return res.status(400).json({
             error: "Student ID, Name, Department, and Year are required"
         });
