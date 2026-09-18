@@ -30,7 +30,7 @@ function SmartCards() {
 
     const loadStudents = useCallback(() => {
         setLoading(true);
-        fetch("${API_URL}/api/students", {
+        fetch(`${API_URL}/api/students`, {
             headers: {
                 "Authorization": "Bearer " + token
             }

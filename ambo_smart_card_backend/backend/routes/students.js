@@ -94,20 +94,11 @@ router.post("/add", verifyToken, upload.fields([
     let photoFilename = null;
 
     // Handle file upload if present
-    if (req.files && req.files.photo) {
-        const photo = req.files.photo;
-        const timestamp = Date.now();
-        const randomStr = Math.random().toString(36).substr(2, 9);
-        photoFilename = `${timestamp}-${randomStr}-${photo.name}`;
-        const uploadPath = path.join(uploadsDir, photoFilename);
-
-        photo.mv(uploadPath, (err) => {
-            if (err) {
-                console.error("File upload error:", err);
-                return res.status(400).json({ error: "Failed to upload photo: " + err.message });
-            }
-            console.log(`📸 Photo uploaded: ${photoFilename}`);
-        });
+    // multer (upload.fields) already saves the file to disk via diskStorage.
+    // req.files.photo is an array of multer file objects — use [0].filename directly.
+    if (req.files && req.files.photo && req.files.photo.length > 0) {
+        photoFilename = req.files.photo[0].filename;
+        console.log(`📸 Photo saved by multer: ${photoFilename}`);
     }
 
     console.log(`➕ ADD STUDENT request: ${student_id} - ${name}`);

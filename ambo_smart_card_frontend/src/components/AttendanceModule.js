@@ -29,7 +29,11 @@ import {
   FormControl,
   InputLabel,
   Tabs,
-  Tab,
+  Tab
+} from '@mui/material';
+import {
+  BarChart,
+  Bar,
   LineChart,
   Line,
   XAxis,
@@ -37,11 +41,7 @@ import {
   CartesianGrid,
   Tooltip as ChartTooltip,
   Legend,
-  ResponsiveContainer
-} from '@mui/material';
-import {
-  BarChart,
-  Bar,
+  ResponsiveContainer,
   PieChart,
   Pie,
   Cell
@@ -65,7 +65,7 @@ function AttendanceModule() {
   const [liveActivity, setLiveActivity] = useState([]);
   const [markStudentId, setMarkStudentId] = useState('');
   const [markedStudent, setMarkedStudent] = useState(null);
-  const token = getToken().getItem('token');
+  const token = getToken();
 
   useEffect(() => {
     fetchTodayAttendance();
@@ -105,7 +105,8 @@ function AttendanceModule() {
       const res = await fetch(`${API_URL}/api/attendance/mark`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({ student_id: markStudentId })
       });
@@ -623,7 +624,7 @@ function AttendanceModule() {
                       ? {rec.person_name}
                     </Typography>
                     <Typography variant="caption" color="textSecondary">
-                      {rec.person_type === 'student' ? 'Student' : 'Employee'} • {rec.department_name}
+                      {rec.person_type === 'student' ? 'Student' : 'Employee'} ï¿½ {rec.department_name}
                     </Typography>
                   </Box>
                   <Chip

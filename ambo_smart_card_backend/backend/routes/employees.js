@@ -18,7 +18,7 @@ router.get('/', verifyToken, adminOnly, (req, res) => {
   let query = `
     SELECT 
       e.*,
-      d.department_name
+      d.name AS department_name
     FROM employees e
     LEFT JOIN departments d ON e.department_id = d.id
     WHERE 1=1
@@ -99,7 +99,7 @@ router.get('/:employeeId', verifyToken, (req, res) => {
   db.query(`
     SELECT 
       e.*,
-      d.department_name
+      d.name AS department_name
     FROM employees e
     LEFT JOIN departments d ON e.department_id = d.id
     WHERE e.employee_id = ?
